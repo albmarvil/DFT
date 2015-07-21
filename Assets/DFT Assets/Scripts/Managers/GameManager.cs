@@ -59,19 +59,36 @@ public class GameManager : MonoBehaviour {
 
     #region Public params
 
+    /// <summary>
+    /// Public property to access to the mapWidth
+    /// </summary>
     public int MapWidth
     {
         get { return m_MapWidth; }
     }
 
+    /// <summary>
+    /// Public property to access to the mapHeight
+    /// </summary>
     public int MapHeight
     {
         get { return m_MapHeight; }
     }
 
+    /// <summary>
+    /// Public property to access to the Tile size
+    /// </summary>
     public float TileSize
     {
         get { return m_TileSize; }
+    }
+
+    /// <summary>
+    /// Public property to access to the number of SpecialTiles
+    /// </summary>
+    public int TotalSpecialTiles
+    {
+        get { return m_TotalSpecialTiles; }
     }
 
 
@@ -89,6 +106,11 @@ public class GameManager : MonoBehaviour {
     /// Tile Size used (height and width)
     /// </summary>
     public float m_TileSize = 1.0f;
+
+    /// <summary>
+    /// Total number of special tiles (NonWalkable, small rocks, huge rocks ...etc)
+    /// </summary>
+    public int m_TotalSpecialTiles = 100;
 
     /// <summary>
     /// Property used to access to the MainCamera GameObject
@@ -126,27 +148,21 @@ public class GameManager : MonoBehaviour {
     public void InitGame()
     {
         ///Cargo aditivamente el nivel de juego
-        GameObject scene = GameObject.FindGameObjectWithTag("Scene");
-        GameObject.Destroy(scene);
+        //GameObject scene = GameObject.FindGameObjectWithTag("Scene");
+        //GameObject.Destroy(scene);
 
-        Application.LoadLevelAdditive("Game");
+        //Application.LoadLevelAdditive("Game");
     }
-
-    #endregion
-
-    #region Private methods
-
-   
 
     #endregion
 
 
     #region Monobehavior calls
 
-    //private void Start()
-    //{
-    //    InitGame();
-    //}
+    private void Start()
+    {
+        InitGame();
+    }
 
     #endregion
 

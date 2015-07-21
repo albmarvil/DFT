@@ -36,7 +36,10 @@ public class PoolManager : MonoBehaviour {
 	private void Awake()
 	{
 		if (m_Instance == null)
-			m_Instance = this;
+        {
+            m_Instance = this;
+            InitPool();
+        }
 		else
 		{
 			Debug.LogError("Someone is trying to create various ClassName [" + name + "]");
@@ -70,12 +73,12 @@ public class PoolManager : MonoBehaviour {
 
 	#endregion
 
-	#region MonoBehaviour calls
+	#region Private methods
 
     /// <summary>
     /// At the initialization, the pool of gameObjects will be filled
     /// </summary>
-	private void Start()
+	private void InitPool()
 	{
 		//We fill the pool
 		foreach (PoolObjectCfg obj in m_Objects)
@@ -93,7 +96,6 @@ public class PoolManager : MonoBehaviour {
                     inst.GetComponent<Transform>().parent = m_PoolTransform;
 					listgo.Add(inst);
 				}
-
 				m_Pool.Add(component.PoolKey, listgo);
 			}
 		}
@@ -114,6 +116,7 @@ public class PoolManager : MonoBehaviour {
 	{
 		GameObject ret = null;
 		PoolObject component = go.GetComponent<PoolObject>();
+
 		if (m_Pool.ContainsKey(component.PoolKey))
 		{
 			int count = m_Pool[component.PoolKey].Count;
@@ -138,6 +141,10 @@ public class PoolManager : MonoBehaviour {
 		else
 		{
 			Debug.LogWarning("GameObject not indexed in the PoolManager");
+            ret = (GameObject)GameObject.Instantiate(go, pos, q);
+            ret.SetActive(true);
+
+            ret.GetComponent<Transform>().parent = m_SceneTransform;
 		}
 		return ret;
 	}

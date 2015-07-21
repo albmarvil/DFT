@@ -60,7 +60,24 @@ public class MapManager : MonoBehaviour {
     /// <summary>
     /// Default tile prefab
     /// </summary>
-    public GameObject m_TilePrefab = null;
+    public GameObject m_TileDefaultPrefab = null;
+
+    /// <summary>
+    /// Special tile prefab
+    /// It's an obstacle. Enemies can't navigate through them
+    /// </summary>
+    public GameObject m_TileObstaclePrefab = null;
+
+    /// <summary>
+    /// Special tile prefab
+    /// Enemies will slowdown when navigatin through them
+    /// </summary>
+    public GameObject m_TileSlow1Prefab = null;
+
+    /// <summary>
+    /// Enemy Spawner prefab
+    /// </summary>
+    public GameObject m_EnemySpawnerPrefab = null;
 
     #endregion
 
@@ -85,40 +102,154 @@ public class MapManager : MonoBehaviour {
     #region Private methods
 
     /// <summary>
-    /// This method creates and places all the tiles in a single map
+    /// This method creates and places all the tiles in a single map.
+    /// 
+    /// The creation of the map will be done in three steps:
+    ///  -Creation of special tiles (TileType different from default)
+    ///  -Creation of default tiles
+    ///  -Creation of Crystals and Enemy Spawners
+    ///  
     /// </summary>
     /// <param name="width">Map width in tile number</param>
     /// <param name="height">Map height in tile number</param>
     /// <param name="tileSize">Tile size given(it will define how big or small is the map in general terms)</param>
-    private void createTileMap(int width, int height, float tileSize)
+    /// <param name="numSpecialTiles">Number of special tiles in the map. This number will never be more than 50% of the total number of tiles</param>
+    private void createTileMap(int width, int height, float tileSize, int numSpecialTiles)
     {
+
+        #region Matrix initialization
+
+        int specialTiles = Mathf.Min((int)(width * height * 0.5f), numSpecialTiles); 
 
         m_Matrix = new Tile[height][];
 
         for (int i = 0; i < height; ++i)
         {
             m_Matrix[i] = new Tile[width];
+        }
+
+        #endregion
+
+
+        #region Creation of Special Tiles
+
+        ///Special tiles will be created within [2, height - 3] interval.
+        ///The line height = 0 will be were crystals are spawned
+        ///The line height = heigth-1 will be were enemy spawners are spawned
+        for (int i = 0; i < specialTiles; ++i)
+        {
+
+            int column = Random.Range(0, width);
+
+            int row = Random.Range(2, height - 2);
+
+            TileType type = TileType.DEFAULT;
+
+            while (type == TileType.DEFAULT)
+            {
+                type = (TileType)Random.Range((int)TileType.OBSTACLE, (int)TileType.END);
+            }
+
+            createTile(row, column, type, tileSize);
+
+        }
+
+        #endregion
+
+        #region Creation of Default Tiles
+        for (int i = 0; i < height; ++i)
+        {
             for (int j = 0; j < width; ++j)
             {
-                Vector3 pos = new Vector3(j * tileSize, 0, i * tileSize);
+                if (m_Matrix[i][j] == null)
+                {
+                    createTile(i, j, TileType.DEFAULT, tileSize);
+                }
+            }
+        }
+        #endregion
 
-                GameObject goTile = PoolManager.Singleton.getInstance(m_TilePrefab, pos, Quaternion.identity);
+        #region Creation of Spawners
 
-                Transform transform = goTile.GetComponent<Transform>();
+        // The number of spawners will be choosen randomly whithin this interval [1, width * 0.5]
+        int numSpawners = Random.Range(1, (int)(width * 0.5f));
 
-                Vector3 scale = transform.localScale;
-                scale.x = tileSize;
-                scale.z = tileSize;
+        for (int i = 0; i <= numSpawners - 1; ++i)
+        {
+            int row = height - 1;
+            int column = -1;
 
-                transform.localScale = scale;
+            while (column == -1)
+            {
+                column = Random.Range(0, width);
+                Tile tile = m_Matrix[row][column];
 
-                transform.parent = m_MapGameObject.GetComponent<Transform>();
-
-                m_Matrix[i][j] = goTile.GetComponent<Tile>();
-
+                if (!tile.isOrigin)
+                {
+                    tile.isOrigin = true;
+                    PoolManager.Singleton.getInstance(m_EnemySpawnerPrefab, tile.NavigationPosition, Quaternion.identity);
+                }
+                else
+                {
+                    column = -1;
+                }
             }
         }
 
+        #endregion
+        
+
+    }
+
+    /// <summary>
+    /// This method creates a single tile, in the correct world position 
+    /// </summary>
+    /// <param name="row">Matrix row. Used to calculate Z position in world space</param>
+    /// <param name="column">Matrix column. Used to calculate X position in world space</param>
+    /// <param name="type">Tile type used to create the new tile</param>
+    /// <param name="tileSize">Tile size, used to obtain the correct world position</param>
+    private void createTile(int row, int column, TileType type, float tileSize)
+    {
+        GameObject prefab = null;
+        switch (type)
+        {
+            case TileType.OBSTACLE:
+                prefab = m_TileObstaclePrefab;
+                break;
+            case TileType.SLOW1:
+                prefab = m_TileSlow1Prefab;
+                break;
+            case TileType.DEFAULT:
+                prefab = m_TileDefaultPrefab;
+                break;
+            default:
+                prefab = m_TileDefaultPrefab;
+                break;
+        }
+
+        Vector3 pos = new Vector3(column * tileSize, 0, row * tileSize);
+
+        GameObject goTile = PoolManager.Singleton.getInstance(prefab, pos, Quaternion.identity);
+
+        Transform transform = goTile.GetComponent<Transform>();
+
+        Vector3 scale = transform.localScale;
+        scale.x = tileSize;
+        scale.z = tileSize;
+
+        transform.localScale = scale;
+
+        transform.parent = m_MapGameObject.GetComponent<Transform>();
+
+        Tile tileComponent = goTile.GetComponent<Tile>();
+
+        //if the tile is in [2, height-3] interval, we will ban construction
+        if (row < 2 || GameManager.Singleton.MapHeight - 3 < row)
+        {
+            tileComponent.Available = false;
+        }
+
+        m_Matrix[row][column] = tileComponent;
     }
 
     #endregion
@@ -129,7 +260,7 @@ public class MapManager : MonoBehaviour {
     {
         m_MapGameObject = GameObject.FindGameObjectWithTag("Map");
 
-        createTileMap(GameManager.Singleton.MapWidth, GameManager.Singleton.MapHeight, GameManager.Singleton.TileSize);
+        createTileMap(GameManager.Singleton.MapWidth, GameManager.Singleton.MapHeight, GameManager.Singleton.TileSize, GameManager.Singleton.TotalSpecialTiles);
     }
 
     #endregion

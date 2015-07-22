@@ -68,8 +68,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DFT Assets\Scripts\AI\EnemySimpleBehavior.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\BuildGhostsRegister.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\CrystalTrigger.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\GUI\BuildHUDButtonController.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\GUI\BuildHUDController.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\GUI\CrystalsHUDController.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Managers\BuildHelpers\BuildingType.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\BuilderManager.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Managers\CrystalManager.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Managers\EnemyManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\MapHelpers\TilePosition.cs" />
@@ -79,8 +87,12 @@
     <Compile Include="Assets\DFT Assets\Scripts\Managers\PoolHelpers\PoolObject.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\PoolHelpers\PoolObjectCfg.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\PoolManager.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Managers\SpawnerManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\NavigationAgent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\RegisterCrystalComponent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\RegisterEnemyComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\RegisterMainCamera.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\RegisterSpawnerComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Tile.cs" />
     <Compile Include="Assets\Store Assets\Rocks and Boulders 2\Shaders\RotateGameObject.cs" />
   </ItemGroup>

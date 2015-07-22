@@ -14,12 +14,57 @@ using System.Collections.Generic;
 
 public class BuilderManager : MonoBehaviour {
 
+    #region Singleton
+
+    /// <summary>
+    /// Singleton instance of the class
+    /// </summary>
+    private static BuilderManager m_Instance = null;
+
+    /// <summary>
+    /// Property to get the singleton instance of the class.
+    /// </summary>
+    public static BuilderManager Singleton { get { return m_Instance; } }
+
+    // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit
+    static BuilderManager() { }
+
+    /// <summary>
+    /// This is like the Init but done by the MonoBehaviour
+    /// </summary>
+    private void Awake()
+    {
+        if (m_Instance == null)
+            m_Instance = this;
+        else
+        {
+            Debug.LogError("Someone is trying to create various BuilderManager [" + name + "]");
+            this.enabled = false;
+        }
+    }
+	
+	/// <summary>
+    /// This is like the Release but done by the MonoBehaviour
+    /// </summary>
+    private void OnDestroy()
+    {
+        if (m_Instance == this)
+            m_Instance = null;
+    }
+
+    #endregion
+
     #region Public params
 
     /// <summary>
     /// Buildings availables to build
     /// </summary>
     public List<GameObject> m_Buildings = new List<GameObject>();
+
+    /// <summary>
+    /// Reference to the Build HUD Controller
+    /// </summary>
+    public BuildHUDController m_BuildHUD = null;
 
     #endregion
 
@@ -28,7 +73,7 @@ public class BuilderManager : MonoBehaviour {
     /// <summary>
     /// Index to the current building
     /// </summary>
-    private int m_CurrentBuildingIndex = -1;
+    private int m_CurrentBuildingIndex = 0;
 
     /// <summary>
     /// Actual tile hovered by the mouse.
@@ -42,22 +87,48 @@ public class BuilderManager : MonoBehaviour {
 
 
     /// <summary>
-    /// Flag that shows if we can build in the current tile (Pathfinding conditions included)
+    /// Flag that indicates if we are in building turn
     /// </summary>
-    //private bool m_CanBuild = false;
+    private bool m_CanBuild = false;
 
     #endregion
 
     #region Public methods
 
-    public void selectBlueCannon()
+    /// <summary>
+    /// Method that configures if it is or not the building turn
+    /// </summary>
+    /// <param name="canBuild">flag to set up</param>
+    public void SetBuildingTurn(bool canBuild)
     {
-        m_CurrentBuildingIndex = 0;
+        m_CanBuild = canBuild;
+        m_BuildHUD.gameObject.SetActive(canBuild);
+
+        if (!canBuild)
+        {
+            PoolManager.Singleton.destroyInstance(m_CurrentBuildingGhost);
+            m_CurrentBuildingGhost = null;
+        }
+        else
+        {
+            m_CurrentBuildingIndex = 0;
+            m_BuildHUD.SelectBuilding((BuildingType)m_CurrentBuildingIndex);
+        }
+       
     }
 
-    public void selectRedCannon()
+    public void UpdateHUD(float time)
     {
-        m_CurrentBuildingIndex = 1;
+        m_BuildHUD.UpdateHUD(((int)time).ToString() + " s");
+    }
+
+    /// <summary>
+    /// Method that configures the actual building
+    /// </summary>
+    /// <param name="type">Build type (used as index)</param>
+    public void SelectBuilding(BuildingType type)
+    {
+        m_CurrentBuildingIndex = (int)type;
     }
 
     /// <summary>
@@ -66,22 +137,8 @@ public class BuilderManager : MonoBehaviour {
     /// <param name="button">Button pressed</param>
     public void onMousePressed(InputManager.MouseButton button){
 
-        if(InputManager.MouseButton.LEFT == button)
+        if(InputManager.MouseButton.LEFT == button && m_CanBuild)
             createBuilding(m_CurrentBuildingIndex, m_CurrentTile);
-
-        if (InputManager.MouseButton.RIGHT == button)
-        {
-            Tile destination = MapManager.Singleton.getTileByWorldPosition(new Vector3(0,0,0));
-
-            NavigationPathfinder.Singleton.calculateOptimalPath(m_CurrentTile, destination);
-        }
-
-        if (InputManager.MouseButton.CENTER == button)
-        {
-            Tile destination = MapManager.Singleton.getTileByWorldPosition(new Vector3(0, 0, 0));
-
-            NavigationPathfinder.Singleton.calculatePath(m_CurrentTile, destination);
-        }
 
     }
 
@@ -106,16 +163,21 @@ public class BuilderManager : MonoBehaviour {
             //we can't block the routes throug the map
             tile.Navigable = false; //has to do this to test if there is a valid path
 
-            //TODO
-            //recoger un spawner y un crystal validos
-            Tile spawners = MapManager.Singleton.getTileByWorldPosition(new Vector3(0,0,(GameManager.Singleton.MapHeight - 1) * GameManager.Singleton.TileSize));
-            Tile crystals = MapManager.Singleton.getTileByWorldPosition(new Vector3(0,0,0));
+            Tile spawners = MapManager.Singleton.getTileByWorldPosition(SpawnerManager.Singleton.Spawners[0].GetComponent<Transform>().position);
+            Tile crystals = MapManager.Singleton.getTileByWorldPosition(CrystalManager.Singleton.Crystals[0].GetComponent<Transform>().position);
 
             List<Tile> path = NavigationPathfinder.Singleton.calculatePath(spawners, crystals);
 
             if (path != null)
             {
                 PoolManager.Singleton.getInstance(m_Buildings[index], tile.NavigationPosition, Quaternion.identity);
+
+                //Tell the enemies that they must recalculate their routes
+                foreach (GameObject enemy in EnemyManager.Singleton.Enemies)
+                {
+                    enemy.SendMessage("CalculateRouteToTarget", SendMessageOptions.DontRequireReceiver);
+                }
+
                 tile.Available = false;
                 tile.Navigable = false;
                 
@@ -166,34 +228,38 @@ public class BuilderManager : MonoBehaviour {
     /// </summary>
     private void FixedUpdate()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        int mask = (1<<LayerMask.NameToLayer("Tiles"));
-
-        RaycastHit hitInfo;
-
-        //Debug.DrawRay(ray.origin, ray.direction, Color.green);
-
-        if (Physics.Raycast(ray, out hitInfo, 1000.0f, mask))
+        if (m_CanBuild)
         {
-            //Debug.Log(hitInfo.collider.gameObject.tag);
-            GameObject col = hitInfo.collider.gameObject;
-            if (col.tag == "Tiles" && m_CurrentTile != col.GetComponent<Tile>())
-            {
-                m_CurrentTile = col.GetComponent<Tile>();
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                if (m_CurrentBuildingIndex != -1)
-                    drawGhost(m_Buildings[m_CurrentBuildingIndex], m_CurrentTile);
+            int mask = (1 << LayerMask.NameToLayer("Tiles"));
+            mask |= (1 << LayerMask.NameToLayer("UI"));
+
+            RaycastHit hitInfo;
+
+            //Debug.DrawRay(ray.origin, ray.direction, Color.green);
+
+            if (Physics.Raycast(ray, out hitInfo, 1000.0f, mask))
+            {
+                //Debug.Log(hitInfo.collider.gameObject.tag);
+                GameObject col = hitInfo.collider.gameObject;
+                if (col.tag == "Tiles" && m_CurrentTile != col.GetComponent<Tile>())
+                {
+                    m_CurrentTile = col.GetComponent<Tile>();
+
+                    if (m_CurrentBuildingIndex != -1)
+                        drawGhost(m_Buildings[m_CurrentBuildingIndex], m_CurrentTile);
+                }
             }
-        }
-        else
-        {
-            //Debug.Log("NONE");
-            m_CurrentTile = null;
-            if (m_CurrentBuildingGhost != null)
+            else
             {
-                PoolManager.Singleton.destroyInstance(m_CurrentBuildingGhost);
-                m_CurrentBuildingGhost = null;
+                //Debug.Log("NONE");
+                m_CurrentTile = null;
+                if (m_CurrentBuildingGhost != null)
+                {
+                    PoolManager.Singleton.destroyInstance(m_CurrentBuildingGhost);
+                    m_CurrentBuildingGhost = null;
+                }
             }
         }
     }

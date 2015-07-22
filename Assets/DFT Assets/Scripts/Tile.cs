@@ -163,8 +163,7 @@ public class Tile : MonoBehaviour {
         if (0 <= row && row < GameManager.Singleton.MapHeight)
         {
             child = MapManager.Singleton.Matrix[row][column];
-            if (child.Navigable)
-                children.Add(child);
+            children.Add(child);
         }
 
         row = NavigationTilePosition.Row - 1;
@@ -172,8 +171,7 @@ public class Tile : MonoBehaviour {
         if (0 <= row && row < GameManager.Singleton.MapHeight)
         {
             child = MapManager.Singleton.Matrix[row][column];
-            if (child.Navigable)
-                children.Add(child);
+            children.Add(child);
         }
 
         row = NavigationTilePosition.Row;
@@ -181,8 +179,7 @@ public class Tile : MonoBehaviour {
         if (0 <= column && column < GameManager.Singleton.MapWidth)
         {
             child = MapManager.Singleton.Matrix[row][column];
-            if (child.Navigable)
-                children.Add(child);
+            children.Add(child);
         }
 
         row = NavigationTilePosition.Row;
@@ -190,8 +187,7 @@ public class Tile : MonoBehaviour {
         if (0 <= column && column < GameManager.Singleton.MapWidth)
         {
             child = MapManager.Singleton.Matrix[row][column];
-            if (child.Navigable)
-                children.Add(child);
+            children.Add(child);
         }
 
         return children;

@@ -241,6 +241,8 @@ public class MapManager : MonoBehaviour {
         // The number of crystals will be choosen randomly whithin this interval [1, width * 0.5]
         int numCrystals = Random.Range(1, (int)(width * 0.5f));
 
+        CrystalManager.Singleton.setTotalCrystals(numCrystals);
+
         for (int i = 0; i <= numCrystals - 1; ++i)
         {
             int row = 0;

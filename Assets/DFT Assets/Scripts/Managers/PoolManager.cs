@@ -149,6 +149,50 @@ public class PoolManager : MonoBehaviour {
 		return ret;
 	}
 
+
+    /// <summary>
+    /// This method will get an object from the pool. If there were any, it will be created instead
+    /// </summary>
+    /// <param name="go">Game Object to create</param>
+    /// <param name="pos">position to create the GO</param>
+    /// <returns>GameObject instantiated in the scene</returns>
+    public GameObject getInstance(GameObject go, Vector3 pos)
+    {
+        GameObject ret = null;
+        PoolObject component = go.GetComponent<PoolObject>();
+
+        if (m_Pool.ContainsKey(component.PoolKey))
+        {
+            int count = m_Pool[component.PoolKey].Count;
+            if (count > 0)
+            {
+                ret = m_Pool[component.PoolKey][count - 1];
+                m_Pool[component.PoolKey].Remove(ret);
+                ret.transform.position = pos;
+                ret.transform.rotation = go.GetComponent<Transform>().rotation;
+                ret.SetActive(true);
+
+                ret.GetComponent<Transform>().parent = m_SceneTransform;
+            }
+            else
+            {
+                ret = (GameObject)GameObject.Instantiate(go, pos, go.GetComponent<Transform>().rotation);
+                ret.SetActive(true);
+
+                ret.GetComponent<Transform>().parent = m_SceneTransform;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("GameObject not indexed in the PoolManager");
+            ret = (GameObject)GameObject.Instantiate(go, pos, go.GetComponent<Transform>().rotation);
+            ret.SetActive(true);
+
+            ret.GetComponent<Transform>().parent = m_SceneTransform;
+        }
+        return ret;
+    }
+
     /// <summary>
     /// This method "deletes" a gameObject from the scene. It will stored in the pool for a future use.
     /// </summary>

@@ -110,9 +110,20 @@ public class NavigationPathfinder : MonoBehaviour {
         while (currentState.m_OpenedNodes.Count > 0)
         {
             List<Tile> children = currentState.CurrentNode.getChildren();
+
+            //filter the children to obtain the Valid ones
+            List<Tile> validChildren = new List<Tile>();
+            foreach (Tile child in children)
+            {
+                if (child.Navigable || child == to) //destinations (node with crystals) aren't navigables
+                {
+                    validChildren.Add(child);
+                }
+            }
+
             //Debug.Log("Current: " + currentState.CurrentNode.name);
             //Debug.Log(currentState.m_OpenedNodes.Count);
-            foreach (Tile child in children)
+            foreach (Tile child in validChildren)
             {
                 
                 float totalPathWeight = child.NavigationWeight + currentState.m_VisitedNodes[currentState.CurrentNode].Value;
@@ -171,7 +182,7 @@ public class NavigationPathfinder : MonoBehaviour {
             //foreach (Tile node in path)
             //{
             //    //Debug.Log(node.name);
-            //    GameObject.Instantiate(marker, node.NavigationPosition + new Vector3(0, 1, 0), Quaternion.identity);
+            //    GameObject.Instantiate(marker2, node.NavigationPosition + new Vector3(0, 1, 0), Quaternion.identity);
             //}
             //Debug.Log("END PATH==============================");
 
@@ -206,7 +217,18 @@ public class NavigationPathfinder : MonoBehaviour {
         while (currentState.m_OpenedNodes.Count > 0 && loop)
         {
             List<Tile> children = currentState.CurrentNode.getChildren();
+
+            //filter the children to obtain the Valid ones
+            List<Tile> validChildren = new List<Tile>();
             foreach (Tile child in children)
+            {
+                if (child.Navigable || child == to) //destinations (node with crystals) aren't navigables
+                {
+                    validChildren.Add(child);
+                }
+            }
+
+            foreach (Tile child in validChildren)
             {
                 float totalPathWeight = 1 + currentState.m_VisitedNodes[currentState.CurrentNode].Value;
 
@@ -260,7 +282,7 @@ public class NavigationPathfinder : MonoBehaviour {
             //foreach (Tile node in path)
             //{
             //    //Debug.Log(node.name);
-            //    GameObject.Instantiate(marker, node.NavigationPosition + new Vector3(0, 1, 0), Quaternion.identity);
+            //    GameObject.Instantiate(marker2, node.NavigationPosition + new Vector3(0, 1, 0), Quaternion.identity);
             //}
             //Debug.Log("END PATH==============================");
 

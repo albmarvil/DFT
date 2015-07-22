@@ -88,11 +88,20 @@ public class NavigationAgent : MonoBehaviour {
         {
             m_CurrentRoute.Push(path[i]);
         }
-        ///puede que haya que hacer un primer pop para quitar el origen
 
         m_CurrentRoute.Pop();
 
         resumeRoute();
+    }
+
+    /// <summary>
+    /// Public method used to stop and erase the current route
+    /// </summary>
+    public void stopRoute()
+    {
+        pauseRoute();
+
+        m_CurrentRoute.Clear();
     }
 
     /// <summary>
@@ -125,6 +134,8 @@ public class NavigationAgent : MonoBehaviour {
             m_CurrentSpeed.y = m_Speed * m_MovingDirection.y;
             m_CurrentSpeed.z = m_Speed * m_MovingDirection.z;
 
+            //update orientation
+            m_Transform.forward = m_MovingDirection;
         }
         
     }
@@ -182,6 +193,8 @@ public class NavigationAgent : MonoBehaviour {
         m_CurrentRoute.Clear();
 
         m_SqrStoppingDistance = m_StoppingDistance * m_StoppingDistance;
+
+        m_Transform = gameObject.GetComponent<Transform>();
     }
 
 
@@ -214,6 +227,23 @@ public class NavigationAgent : MonoBehaviour {
             m_canNavigate = false;
             m_MovingDirection = Vector3.zero;
         }
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        Tile[] route = m_CurrentRoute.ToArray();
+        for(int i = 0; i < route.Length-1; ++i)
+        {
+            Tile t = route[i];
+            Tile t1 = route[i+1];
+            Debug.DrawLine(t.NavigationPosition, t1.NavigationPosition);
+        }
+
+
+        //Vector3 forward = m_Transform.forward.normalized;
+
+        //Debug.DrawLine(m_Transform.position, forward + m_Transform.position, Color.green);
     }
 
     #endregion

@@ -68,6 +68,21 @@ public class BuilderManager : MonoBehaviour {
 
         if(InputManager.MouseButton.LEFT == button)
             createBuilding(m_CurrentBuildingIndex, m_CurrentTile);
+
+        if (InputManager.MouseButton.RIGHT == button)
+        {
+            Tile destination = MapManager.Singleton.getTileByWorldPosition(new Vector3(0,0,0));
+
+            NavigationPathfinder.Singleton.calculateOptimalPath(m_CurrentTile, destination);
+        }
+
+        if (InputManager.MouseButton.CENTER == button)
+        {
+            Tile destination = MapManager.Singleton.getTileByWorldPosition(new Vector3(0, 0, 0));
+
+            NavigationPathfinder.Singleton.calculatePath(m_CurrentTile, destination);
+        }
+
     }
 
     #endregion
@@ -88,8 +103,30 @@ public class BuilderManager : MonoBehaviour {
 
         if (index != -1 && tile != null && tile.Available)
         {
-            PoolManager.Singleton.getInstance(m_Buildings[index], tile.NavigationPosition, Quaternion.identity);
-            tile.Available = false;
+            //we can't block the routes throug the map
+            tile.Navigable = false; //has to do this to test if there is a valid path
+
+            //TODO
+            //recoger un spawner y un crystal validos
+            Tile spawners = MapManager.Singleton.getTileByWorldPosition(new Vector3(0,0,(GameManager.Singleton.MapHeight - 1) * GameManager.Singleton.TileSize));
+            Tile crystals = MapManager.Singleton.getTileByWorldPosition(new Vector3(0,0,0));
+
+            List<Tile> path = NavigationPathfinder.Singleton.calculatePath(spawners, crystals);
+
+            if (path != null)
+            {
+                PoolManager.Singleton.getInstance(m_Buildings[index], tile.NavigationPosition, Quaternion.identity);
+                tile.Available = false;
+                tile.Navigable = false;
+                
+            }
+            else
+            {
+                Debug.LogWarning("Cannot block map routes with buildings");
+                tile.Navigable = true;
+                tile.Available = false;
+            }
+
             drawGhost(m_Buildings[index], tile);
         }
             

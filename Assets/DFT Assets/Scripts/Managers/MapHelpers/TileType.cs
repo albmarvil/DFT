@@ -13,8 +13,8 @@ using System.Collections;
 
 public enum TileType {
 
-    OBSTACLE = 0,
-    DEFAULT = 1,
+    DEFAULT = 0,
+    OBSTACLE = 1,
     SLOW1 = 2,
     END = 3,
 }

@@ -79,6 +79,19 @@ public class MapManager : MonoBehaviour {
     /// </summary>
     public GameObject m_EnemySpawnerPrefab = null;
 
+    /// <summary>
+    /// Crystal prefab
+    /// </summary>
+    public GameObject m_CrystalPrefab = null;
+
+    /// <summary>
+    /// Property to access the matrix that represents the navigation grid
+    /// </summary>
+    public Tile[][] Matrix
+    {
+        get { return m_Matrix; }
+    }
+
     #endregion
 
     #region Private params
@@ -96,6 +109,22 @@ public class MapManager : MonoBehaviour {
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Returns a Tile giving a world position. Null if the position is wrong
+    /// </summary>
+    /// <param name="position">World position</param>
+    /// <returns>Tile in that wolrd position</returns>
+    public Tile getTileByWorldPosition(Vector3 position)
+    {
+        int row = (int)(position.z / GameManager.Singleton.TileSize);
+        int column = (int)(position.x / GameManager.Singleton.TileSize);
+
+        if (row < GameManager.Singleton.MapHeight && column < GameManager.Singleton.MapWidth)
+            return m_Matrix[row][column];
+        else
+            return null;
+    }
 
     #endregion
 
@@ -194,6 +223,7 @@ public class MapManager : MonoBehaviour {
                 if (!tile.isOrigin)
                 {
                     tile.isOrigin = true;
+                    tile.Available = false;
                     GameObject spawner = PoolManager.Singleton.getInstance(m_EnemySpawnerPrefab, tile.NavigationPosition, Quaternion.identity);
                     spawner.GetComponent<Transform>().localScale *= tileSize;
                 }
@@ -205,7 +235,39 @@ public class MapManager : MonoBehaviour {
         }
 
         #endregion
-        
+
+        #region Creation of Crystals
+
+        // The number of crystals will be choosen randomly whithin this interval [1, width * 0.5]
+        int numCrystals = Random.Range(1, (int)(width * 0.5f));
+
+        for (int i = 0; i <= numCrystals - 1; ++i)
+        {
+            int row = 0;
+            int column = -1;
+
+            while (column == -1)
+            {
+                column = Random.Range(0, width);
+                Tile tile = m_Matrix[row][column];
+
+                if (!tile.isDestination)
+                {
+                    tile.isDestination = true;
+                    tile.Navigable = false;
+                    tile.Available = false;
+                    GameObject spawner = PoolManager.Singleton.getInstance(m_CrystalPrefab, tile.NavigationPosition, Quaternion.identity);
+                    spawner.GetComponent<Transform>().localScale *= tileSize;
+                }
+                else
+                {
+                    column = -1;
+                }
+            }
+        }
+
+        #endregion
+
 
     }
 

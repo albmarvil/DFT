@@ -10,6 +10,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 
 public class Tile : MonoBehaviour {
@@ -32,7 +33,8 @@ public class Tile : MonoBehaviour {
     /// </summary>
     public bool Navigable
     {
-        get { return !(m_TileType == TileType.OBSTACLE || m_available); }
+        get { return m_navigable; }
+        set { m_navigable = value; }
     }
 
 
@@ -41,7 +43,7 @@ public class Tile : MonoBehaviour {
     /// </summary>
     public bool Available
     {
-        get { return m_TileType != TileType.OBSTACLE && m_available; }
+        get { return m_available; }
         set { m_available = value; }
     }
 
@@ -51,6 +53,24 @@ public class Tile : MonoBehaviour {
     public Vector3 NavigationPosition
     {
         get { return m_NavPoint.position; }
+    }
+
+    /// <summary>
+    /// Position on the squared grid
+    /// </summary>
+    public TilePosition NavigationTilePosition
+    {
+        get { return m_TilePosition; }
+    }
+
+    /// <summary>
+    /// Navigation weight for this tile
+    /// </summary>
+    public float m_NavigationWeight = 1.0f;
+
+    public float NavigationWeight
+    {
+        get { return m_NavigationWeight; }
     }
 
     public bool isOrigin
@@ -79,6 +99,12 @@ public class Tile : MonoBehaviour {
     /// </summary>
     private bool m_available = true;
 
+    /// <summary>
+    /// Flag that indicates if a tile is navigable by agents
+    /// </summary>
+    [SerializeField]
+    private bool m_navigable = true;
+
     /////////////////Attributes for pathfinding//////////////////////
 
     /// <summary>
@@ -91,6 +117,11 @@ public class Tile : MonoBehaviour {
     /// </summary>
     private bool m_destination = false;
 
+    /// <summary>
+    /// Position of the tile in the squared grid
+    /// </summary>
+    private TilePosition m_TilePosition = new TilePosition();
+
     #endregion
 
     #region Public methods
@@ -100,19 +131,70 @@ public class Tile : MonoBehaviour {
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public void setTileConfig(int x, int y)
+    public void setTileConfig(int row, int column)
     {
-        m_name = x + "_" + y + "_TILE_"+m_TileType.ToString();
+        m_name = row + "_" + column + "_TILE_"+m_TileType.ToString();
         gameObject.name = m_name;
+
+        m_TilePosition.Column = column;
+        m_TilePosition.Row = row;
     }
 
     /// <summary>
     /// Method used to get the tile weight for pathfinding.
     /// </summary>
     /// <returns>Node weight for this tile in the navigation graph</returns>
-    public int getWeight()
+    
+
+    /// <summary>
+    /// Method used for pathfinding. It will return all the children of this Tile.
+    /// Also will filter the tiles, giving only those where navigation is allowed
+    /// </summary>
+    /// <returns>Valid children of this tile</returns>
+    public List<Tile> getChildren()
     {
-        return (int)m_TileType;
+        List<Tile> children = new List<Tile>();
+
+        Tile child = null;
+
+
+        int row = NavigationTilePosition.Row + 1;
+        int column = NavigationTilePosition.Column;
+        if (0 <= row && row < GameManager.Singleton.MapHeight)
+        {
+            child = MapManager.Singleton.Matrix[row][column];
+            if (child.Navigable)
+                children.Add(child);
+        }
+
+        row = NavigationTilePosition.Row - 1;
+        column = NavigationTilePosition.Column;
+        if (0 <= row && row < GameManager.Singleton.MapHeight)
+        {
+            child = MapManager.Singleton.Matrix[row][column];
+            if (child.Navigable)
+                children.Add(child);
+        }
+
+        row = NavigationTilePosition.Row;
+        column = NavigationTilePosition.Column + 1;
+        if (0 <= column && column < GameManager.Singleton.MapWidth)
+        {
+            child = MapManager.Singleton.Matrix[row][column];
+            if (child.Navigable)
+                children.Add(child);
+        }
+
+        row = NavigationTilePosition.Row;
+        column = NavigationTilePosition.Column - 1;
+        if (0 <= column && column < GameManager.Singleton.MapWidth)
+        {
+            child = MapManager.Singleton.Matrix[row][column];
+            if (child.Navigable)
+                children.Add(child);
+        }
+
+        return children;
     }
 
     #endregion

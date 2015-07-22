@@ -104,7 +104,7 @@ public class BuilderManager : MonoBehaviour {
         m_CanBuild = canBuild;
         m_BuildHUD.gameObject.SetActive(canBuild);
 
-        if (!canBuild)
+        if (!canBuild && m_CurrentBuildingGhost != null)
         {
             PoolManager.Singleton.destroyInstance(m_CurrentBuildingGhost);
             m_CurrentBuildingGhost = null;
@@ -129,17 +129,6 @@ public class BuilderManager : MonoBehaviour {
     public void SelectBuilding(BuildingType type)
     {
         m_CurrentBuildingIndex = (int)type;
-    }
-
-    /// <summary>
-    /// Callback used when mouse is pressed
-    /// </summary>
-    /// <param name="button">Button pressed</param>
-    public void onMousePressed(InputManager.MouseButton button){
-
-        if(InputManager.MouseButton.LEFT == button && m_CanBuild)
-            createBuilding(m_CurrentBuildingIndex, m_CurrentTile);
-
     }
 
     #endregion
@@ -216,6 +205,19 @@ public class BuilderManager : MonoBehaviour {
         {
             m_CurrentBuildingGhost = PoolManager.Singleton.getInstance(building.GetComponent<BuildGhostsRegister>().m_RedGhostPrefab, tile.NavigationPosition, Quaternion.identity);
         }
+
+    }
+
+
+    /// <summary>
+    /// Callback used when mouse is pressed
+    /// </summary>
+    /// <param name="button">Button pressed</param>
+    private void onMousePressed(InputManager.MouseButton button)
+    {
+
+        if (InputManager.MouseButton.LEFT == button && m_CanBuild)
+            createBuilding(m_CurrentBuildingIndex, m_CurrentTile);
 
     }
 

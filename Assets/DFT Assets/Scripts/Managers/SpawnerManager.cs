@@ -129,6 +129,11 @@ public class SpawnerManager : MonoBehaviour {
     public float m_WaveContribuition = 1.0f;
 
     /// <summary>
+    /// Reference to the HUD controller
+    /// </summary>
+    public WavesHUDController m_HUDController = null;
+
+    /// <summary>
     /// List of the active spawners in the scene
     /// </summary>
     public List<GameObject> Spawners
@@ -207,6 +212,10 @@ public class SpawnerManager : MonoBehaviour {
         PoolManager.Singleton.getInstance(enemy, position);
 
         --m_CurrentWave.m_RemainingEnemies;
+
+        Debug.Log("Enem: " + m_CurrentWave.m_RemainingEnemies + " / " + m_CurrentWave.m_NumEnemies);
+
+        Debug.Log("Time: " + m_CurrentWave.m_SpawnTime + " / " + m_InitWaveCfg.m_SpawnTime);
     }
 
     /// <summary>
@@ -217,6 +226,8 @@ public class SpawnerManager : MonoBehaviour {
         BuilderManager.Singleton.SetBuildingTurn(false);
 
         ++m_WaveCount;
+
+        m_HUDController.UpdateHUD(m_WaveCount);
 
         int newNumEnemies = (int)(m_CurrentWave.m_NumEnemies + m_WaveCount * m_WaveContribuition);
 
@@ -229,6 +240,22 @@ public class SpawnerManager : MonoBehaviour {
         m_inWave = true;
     }
 
+    /// <summary>
+    /// This methods receives the events of logic orders sended by InputManager
+    /// </summary>
+    /// <param name="order">Order received</param>
+    /// <param name="ok">state of the order (Positive or Negative)</param>
+    private void onOrderReceived(InputManager.InputOrders order, bool ok)
+    {
+        if (order == InputManager.InputOrders.ACCEPT && ok)
+        {
+            if (!m_inWave)
+            {
+                StartWave();
+            }
+        }
+    }
+
     #endregion
 
     #region Monobehavior calls
@@ -237,12 +264,11 @@ public class SpawnerManager : MonoBehaviour {
     {
         if (funca)
         {
-
             if (m_inWave && m_CurrentWave != null)
             {
                 m_CurrentWave.m_TimeAcum += Time.deltaTime;
 
-                if (m_CurrentWave.m_TimeAcum >= m_CurrentWave.m_SpawnTime)
+                if (m_CurrentWave.m_TimeAcum >= m_CurrentWave.m_SpawnTime && m_CurrentWave.m_RemainingEnemies > 0)
                 {
                     SpawnEnemy();
                     m_CurrentWave.m_TimeAcum = 0.0f;
@@ -275,8 +301,10 @@ public class SpawnerManager : MonoBehaviour {
     private void Start()
     {
         m_CurrentWave = m_InitWaveCfg;
-        ++m_WaveCount;
         m_inWave = true;
+
+        InputManager.Singleton.RegisterOrderEvent(onOrderReceived);
+
     }
 
     /// <summary>
@@ -285,6 +313,12 @@ public class SpawnerManager : MonoBehaviour {
     private void OnDisable()
     {
         m_spawners.Clear();
+
+        if (InputManager.Singleton != null)
+        {
+            InputManager.Singleton.UnregisterOrderEvent(onOrderReceived);
+        }
+
     }
 
     #endregion

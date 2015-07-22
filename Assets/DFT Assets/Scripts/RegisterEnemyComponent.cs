@@ -20,12 +20,14 @@ public class RegisterEnemyComponent : MonoBehaviour
 
     private void OnEnable()
     {
-        EnemyManager.Singleton.RegisterEnemy(gameObject);
+        if(EnemyManager.Singleton != null)
+            EnemyManager.Singleton.RegisterEnemy(gameObject);
     }
 
     private void OnDisable()
     {
-        EnemyManager.Singleton.UnregisterEnemy(gameObject);
+        if (EnemyManager.Singleton != null)
+            EnemyManager.Singleton.UnregisterEnemy(gameObject);
     }
        
     #endregion

@@ -28,13 +28,34 @@ public class InputManager : MonoBehaviour {
         CENTER = 2
     }
 
+    public enum InputOrders
+    {
+        ACCEPT,
+        CAMERA_LEFT,
+        CAMERA_RIGHT,
+        CAMERA_UP,
+        CAMERA_DOWN,
+        CAMERA_LEFT_ROTATION,
+        CAMERA_RIGHT_ROTATION,
+        CAMERA_ZOOM_IN,
+        CAMERA_ZOOM_OUT
+    }
+
     /// <summary>
     /// Delegate used to throw input events. Mouse clicks
     /// </summary>
-    /// <param name="button"></param>
+    /// <param name="button">Mouse button pressed</param>
     public delegate void onMousePressed(MouseButton button);
 
-	    #region Singleton
+
+    /// <summary>
+    /// Delegate used to throw input events. Logic orders
+    /// </summary>
+    /// <param name="order">Logic order given</param>
+    /// <param name="ok">True to throw the order, false to cancel it</param>
+    public delegate void onOrderReceived(InputOrders order, bool ok);
+
+	#region Singleton
 
     /// <summary>
     /// Singleton instance of the class
@@ -77,14 +98,22 @@ public class InputManager : MonoBehaviour {
 
     #region Private params
 
+    /// <summary>
+    /// Delegate register
+    /// </summary>
     private onMousePressed m_MousePressed = null;
+
+    /// <summary>
+    /// Delegate register
+    /// </summary>
+    private onOrderReceived m_OrderReceived = null;
 
     #endregion
 
     #region Public methods
 
     /// <summary>
-    /// Method used to register events
+    /// Method used to register mouse pressed events
     /// </summary>
     public void RegisterMousePressedEvent(onMousePressed mousePressed)
     {
@@ -92,11 +121,28 @@ public class InputManager : MonoBehaviour {
     }
 
     /// <summary>
-    /// Method used to unregister events
+    /// Method used to unregister mouse pressed events
     /// </summary>
     public void UnregisterMousePressedEvent(onMousePressed mousePressed)
     {
         m_MousePressed -= mousePressed;
+    }
+
+
+    /// <summary>
+    /// Method used to register logic order events
+    /// </summary>
+    public void RegisterOrderEvent(onOrderReceived orderReceived)
+    {
+        m_OrderReceived += orderReceived;
+    }
+
+    /// <summary>
+    /// Method used to unregister logic order events
+    /// </summary>
+    public void UnregisterOrderEvent(onOrderReceived orderReceived)
+    {
+        m_OrderReceived -= orderReceived;
     }
 
     #endregion
@@ -104,7 +150,9 @@ public class InputManager : MonoBehaviour {
     #region Monobehavior calls
 
     /// <summary>
-    /// Each frame the manager will chek the status of the mouse and thro different callbacks
+    /// Each frame the manager will chek the status of the mouse and throw different callbacks
+    /// 
+    /// Also will check the different keys and cases to throw logic orders
     /// </summary>
     private void Update()
     {
@@ -126,6 +174,96 @@ public class InputManager : MonoBehaviour {
             if (m_MousePressed != null)
                 m_MousePressed(MouseButton.CENTER);
         }
+
+
+        if (Input.GetButtonDown("Submit"))
+        {
+            if (m_OrderReceived != null)
+                m_OrderReceived(InputOrders.ACCEPT, true);
+        }
+        else if (Input.GetButtonUp("Submit"))
+        {
+            if (m_OrderReceived != null)
+                m_OrderReceived(InputOrders.ACCEPT, false);
+        }
+
+        if (Input.GetAxis("Horizontal") > 0)
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_RIGHT, true);
+                m_OrderReceived(InputOrders.CAMERA_LEFT, false);
+            }
+        }
+        else if (Input.GetAxis("Horizontal") < 0)
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_RIGHT, false);
+                m_OrderReceived(InputOrders.CAMERA_LEFT, true);
+            }
+        }
+        else
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_RIGHT, false);
+                m_OrderReceived(InputOrders.CAMERA_LEFT, false);
+            }
+        }
+
+        if (Input.GetAxis("Vertical") > 0)
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_UP, true);
+                m_OrderReceived(InputOrders.CAMERA_DOWN, false);
+            }
+        }
+        else if (Input.GetAxis("Vertical") < 0)
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_UP, false);
+                m_OrderReceived(InputOrders.CAMERA_DOWN, true);
+            }
+        }
+        else
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_UP, false);
+                m_OrderReceived(InputOrders.CAMERA_DOWN, false);
+            }
+        }
+
+
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_ZOOM_IN, true);
+                m_OrderReceived(InputOrders.CAMERA_ZOOM_OUT, false);
+            }
+        }
+        else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_ZOOM_IN, false);
+                m_OrderReceived(InputOrders.CAMERA_ZOOM_OUT, true);
+            }
+        }
+        else
+        {
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_ZOOM_IN, false);
+                m_OrderReceived(InputOrders.CAMERA_ZOOM_OUT, false);
+            }
+        }
+
+        
     }
 
     #endregion

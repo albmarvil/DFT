@@ -75,11 +75,6 @@ public class Tile : MonoBehaviour {
     private string m_name;
 
     /// <summary>
-    /// Identification number
-    /// </summary>
-    private int m_ID;
-
-    /// <summary>
     /// Flag that indicates if a tile is available for construction
     /// </summary>
     private bool m_available = true;
@@ -107,8 +102,8 @@ public class Tile : MonoBehaviour {
     /// <param name="y"></param>
     public void setTileConfig(int x, int y)
     {
-        m_name = x + "_" + y + "_TILE";
-        m_ID = (int)m_TileType + x / y;
+        m_name = x + "_" + y + "_TILE_"+m_TileType.ToString();
+        gameObject.name = m_name;
     }
 
     /// <summary>

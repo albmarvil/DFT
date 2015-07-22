@@ -138,10 +138,17 @@ public class MapManager : MonoBehaviour {
         ///The line height = heigth-1 will be were enemy spawners are spawned
         for (int i = 0; i < specialTiles; ++i)
         {
-
+            
             int column = Random.Range(0, width);
 
             int row = Random.Range(2, height - 2);
+
+            while (m_Matrix[row][column] != null)
+            {
+                column = Random.Range(0, width);
+
+                row = Random.Range(2, height - 2);
+            }
 
             TileType type = TileType.DEFAULT;
 
@@ -187,7 +194,8 @@ public class MapManager : MonoBehaviour {
                 if (!tile.isOrigin)
                 {
                     tile.isOrigin = true;
-                    PoolManager.Singleton.getInstance(m_EnemySpawnerPrefab, tile.NavigationPosition, Quaternion.identity);
+                    GameObject spawner = PoolManager.Singleton.getInstance(m_EnemySpawnerPrefab, tile.NavigationPosition, Quaternion.identity);
+                    spawner.GetComponent<Transform>().localScale *= tileSize;
                 }
                 else
                 {
@@ -235,6 +243,7 @@ public class MapManager : MonoBehaviour {
 
         Vector3 scale = transform.localScale;
         scale.x = tileSize;
+        scale.y *= tileSize; 
         scale.z = tileSize;
 
         transform.localScale = scale;
@@ -248,6 +257,8 @@ public class MapManager : MonoBehaviour {
         {
             tileComponent.Available = false;
         }
+
+        tileComponent.setTileConfig(row, column);
 
         m_Matrix[row][column] = tileComponent;
     }

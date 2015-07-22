@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\DFT Assets\Scripts\BuildGhostsRegister.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\EnemyController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\BuilderManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\InputManager.cs" />

@@ -59,12 +59,17 @@ public class BuilderManager : MonoBehaviour {
     /// <summary>
     /// Buildings availables to build
     /// </summary>
-    public List<GameObject> m_Buildings = new List<GameObject>();
+    public List<BuildingCfg> m_Buildings = new List<BuildingCfg>();
 
     /// <summary>
     /// Reference to the Build HUD Controller
     /// </summary>
     public BuildHUDController m_BuildHUD = null;
+
+    /// <summary>
+    /// Reference to the MoneyHUDController
+    /// </summary>
+    public MoneyHUDController m_MoneyHUDController = null;
 
     #endregion
 
@@ -108,6 +113,7 @@ public class BuilderManager : MonoBehaviour {
         {
             PoolManager.Singleton.destroyInstance(m_CurrentBuildingGhost);
             m_CurrentBuildingGhost = null;
+            m_MoneyHUDController.EnoughMoney(true);
         }
         else
         {
@@ -144,8 +150,6 @@ public class BuilderManager : MonoBehaviour {
     /// <param name="tile">Tile to build</param>
     private void createBuilding(int index, Tile tile)
     {
-        //TODO
-        //comprobar el coste de dinero
 
         if (index != -1 && tile != null && tile.Available)
         {
@@ -159,16 +163,25 @@ public class BuilderManager : MonoBehaviour {
 
             if (path != null)
             {
-                PoolManager.Singleton.getInstance(m_Buildings[index], tile.NavigationPosition, Quaternion.identity);
-
-                //Tell the enemies that they must recalculate their routes
-                foreach (GameObject enemy in EnemyManager.Singleton.Enemies)
+                if (MoneyManager.Singleton.SpendMoney(m_Buildings[index].m_Cost))
                 {
-                    enemy.SendMessage("CalculateRouteToTarget", SendMessageOptions.DontRequireReceiver);
-                }
+                    PoolManager.Singleton.getInstance(m_Buildings[index].m_Building, tile.NavigationPosition, Quaternion.identity);
 
-                tile.Available = false;
-                tile.Navigable = false;
+                    //Tell the enemies that they must recalculate their routes
+                    foreach (GameObject enemy in EnemyManager.Singleton.Enemies)
+                    {
+                        enemy.SendMessage("CalculateRouteToTarget", SendMessageOptions.DontRequireReceiver);
+                    }
+
+                    tile.Available = false;
+                    tile.Navigable = false;
+                }
+                else
+                {
+                    Debug.LogWarning("Not enough money");
+                    tile.Navigable = true;
+                    tile.Available = false;
+                }
                 
             }
             else
@@ -178,7 +191,7 @@ public class BuilderManager : MonoBehaviour {
                 tile.Available = false;
             }
 
-            drawGhost(m_Buildings[index], tile);
+            drawGhost(m_Buildings[index].m_Building, tile, m_Buildings[index].m_Cost);
         }
             
     }
@@ -188,7 +201,8 @@ public class BuilderManager : MonoBehaviour {
     /// </summary>
     /// <param name="building">Ghost to draw</param>
     /// <param name="tile">Tile where to draw</param>
-    private void drawGhost(GameObject building, Tile tile)
+    /// <param name="cost">Cost of the building</param>
+    private void drawGhost(GameObject building, Tile tile, float cost)
     {
         //if there were any ghost in a previous tile, first destroy it
         if (m_CurrentBuildingGhost != null)
@@ -197,7 +211,10 @@ public class BuilderManager : MonoBehaviour {
             m_CurrentBuildingGhost = null;
         }
 
-        if (tile.Available)
+        bool enoughMoney = MoneyManager.Singleton.Money >= cost;
+        m_MoneyHUDController.EnoughMoney(enoughMoney);
+
+        if (tile.Available && enoughMoney)
         {
             m_CurrentBuildingGhost = PoolManager.Singleton.getInstance(building.GetComponent<BuildGhostsRegister>().m_GreenGhostPrefab, tile.NavigationPosition, Quaternion.identity);
         }
@@ -235,7 +252,7 @@ public class BuilderManager : MonoBehaviour {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             int mask = (1 << LayerMask.NameToLayer("Tiles"));
-            mask |= (1 << LayerMask.NameToLayer("UI"));
+            mask |= (1 << LayerMask.NameToLayer("HUD"));
 
             RaycastHit hitInfo;
 
@@ -250,7 +267,7 @@ public class BuilderManager : MonoBehaviour {
                     m_CurrentTile = col.GetComponent<Tile>();
 
                     if (m_CurrentBuildingIndex != -1)
-                        drawGhost(m_Buildings[m_CurrentBuildingIndex], m_CurrentTile);
+                        drawGhost(m_Buildings[m_CurrentBuildingIndex].m_Building, m_CurrentTile, m_Buildings[m_CurrentBuildingIndex].m_Cost);
                 }
             }
             else

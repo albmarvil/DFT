@@ -181,6 +181,13 @@ public class InputManager : MonoBehaviour {
     private void Update()
     {
 
+        Vector3 mousePos = Input.mousePosition;
+
+        ///make position relative to screen dimensions
+        mousePos.x /= Screen.width;
+        mousePos.y /= Screen.height;
+
+
         if (Input.GetMouseButtonDown((int)MouseButton.LEFT))
         {
             if(m_MousePressed != null)
@@ -212,7 +219,7 @@ public class InputManager : MonoBehaviour {
         }
 
 
-
+        ///Horizontal Camera movement
         if (Input.GetAxis("Horizontal") > 0.0f)
         {
             if (m_OrderReceived != null)
@@ -229,6 +236,27 @@ public class InputManager : MonoBehaviour {
                 m_OrderReceived(InputOrders.CAMERA_LEFT, true, Input.GetAxis("Horizontal"));
             }
         }
+        else if (0.0f <= mousePos.x && mousePos.x <= m_HorizontalThreshold.x)
+        {
+            float value = (1.0f - (mousePos.x / m_HorizontalThreshold.x));
+
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_LEFT, true, -value);
+                m_OrderReceived(InputOrders.CAMERA_RIGHT, false, 0.0f);
+            }
+
+        }
+        else if (m_HorizontalThreshold.y <= mousePos.x && mousePos.x <= 1.0f)
+        {
+            float value = (mousePos.x - m_HorizontalThreshold.y) / (1.0f - m_HorizontalThreshold.y);
+
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_LEFT, false, 0.0f);
+                m_OrderReceived(InputOrders.CAMERA_RIGHT, true, value);
+            }
+        }
         else
         {
             if (m_OrderReceived != null)
@@ -238,6 +266,9 @@ public class InputManager : MonoBehaviour {
             }
         }
 
+
+
+        //Vertical Camera movement
         if (Input.GetAxis("Vertical") > 0.0f)
         {
             if (m_OrderReceived != null)
@@ -252,6 +283,31 @@ public class InputManager : MonoBehaviour {
             {
                 m_OrderReceived(InputOrders.CAMERA_UP, false, Input.GetAxis("Vertical"));
                 m_OrderReceived(InputOrders.CAMERA_DOWN, true, Input.GetAxis("Vertical"));
+            }
+        }
+        else if (0.0f <= mousePos.y && mousePos.y <= m_VerticalThreshold.x)
+        {
+            float value = (1.0f - (mousePos.y / m_VerticalThreshold.x));
+
+            //Debug.Log("CAMERA_LEFT: " + value);
+
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_DOWN, true, -value);
+                m_OrderReceived(InputOrders.CAMERA_UP, false, 0.0f);
+            }
+
+        }
+        else if (m_VerticalThreshold.y <= mousePos.y && mousePos.y <= 1.0f)
+        {
+            float value = (mousePos.y - m_VerticalThreshold.y) / (1.0f - m_VerticalThreshold.y);
+
+            //Debug.Log("CAMERA_RIGHT: " + value);
+
+            if (m_OrderReceived != null)
+            {
+                m_OrderReceived(InputOrders.CAMERA_DOWN, false, 0.0f);
+                m_OrderReceived(InputOrders.CAMERA_UP, true, value);
             }
         }
         else
@@ -293,92 +349,92 @@ public class InputManager : MonoBehaviour {
 
         #region Camera movement with mouse
 
-        Vector3 mousePos = Input.mousePosition;
+        //Vector3 mousePos = Input.mousePosition;
 
-        //Debug.Log("Absolute: " + mousePos);
+        ////Debug.Log("Absolute: " + mousePos);
 
-        ///make position relative to screen dimensions
-        mousePos.x /= Screen.width;
-        mousePos.y /= Screen.height;
+        /////make position relative to screen dimensions
+        //mousePos.x /= Screen.width;
+        //mousePos.y /= Screen.height;
 
-        //Debug.Log("Relative: " + mousePos + "Screen: " + Screen.width + ", " + Screen.height);
+        ////Debug.Log("Relative: " + mousePos + "Screen: " + Screen.width + ", " + Screen.height);
 
-        ///Now considering the screen threshold for mouse movement we will send the logic orders
+        /////Now considering the screen threshold for mouse movement we will send the logic orders
 
-        ///Horizontal movement
-        if (0.0f <= mousePos.x && mousePos.x <= m_HorizontalThreshold.x)
-        {
-            float value =  (1.0f - (mousePos.x / m_HorizontalThreshold.x));
+        /////Horizontal movement
+        //if (0.0f <= mousePos.x && mousePos.x <= m_HorizontalThreshold.x)
+        //{
+        //    float value =  (1.0f - (mousePos.x / m_HorizontalThreshold.x));
 
-            //Debug.Log("CAMERA_LEFT: " + value);
+        //    //Debug.Log("CAMERA_LEFT: " + value);
 
-            if (m_OrderReceived != null)
-            {
-                m_OrderReceived(InputOrders.CAMERA_LEFT, true, -value);
-                m_OrderReceived(InputOrders.CAMERA_RIGHT, false, 0.0f);
-            }
+        //    if (m_OrderReceived != null)
+        //    {
+        //        m_OrderReceived(InputOrders.CAMERA_LEFT, true, -value);
+        //        m_OrderReceived(InputOrders.CAMERA_RIGHT, false, 0.0f);
+        //    }
 
-        }
-        else if (m_HorizontalThreshold.y <= mousePos.x && mousePos.x <= 1.0f)
-        {
-            float value = (mousePos.x - m_HorizontalThreshold.y) / (1.0f - m_HorizontalThreshold.y);
+        //}
+        //else if (m_HorizontalThreshold.y <= mousePos.x && mousePos.x <= 1.0f)
+        //{
+        //    float value = (mousePos.x - m_HorizontalThreshold.y) / (1.0f - m_HorizontalThreshold.y);
 
-            //Debug.Log("CAMERA_RIGHT: " + value);
+        //    //Debug.Log("CAMERA_RIGHT: " + value);
 
-            if (m_OrderReceived != null)
-            {
-                m_OrderReceived(InputOrders.CAMERA_LEFT, false, 0.0f);
-                m_OrderReceived(InputOrders.CAMERA_RIGHT, true, value);
-            }
-        }
-        else
-        {
+        //    if (m_OrderReceived != null)
+        //    {
+        //        m_OrderReceived(InputOrders.CAMERA_LEFT, false, 0.0f);
+        //        m_OrderReceived(InputOrders.CAMERA_RIGHT, true, value);
+        //    }
+        //}
+        //else
+        //{
 
-            //Debug.Log("CAMERA_STOP");
-            if (m_OrderReceived != null)
-            {
-                m_OrderReceived(InputOrders.CAMERA_LEFT, false, 0.0f);
-                m_OrderReceived(InputOrders.CAMERA_RIGHT, false, 0.0f);
-            }
-        }
+        //    //Debug.Log("CAMERA_STOP");
+        //    if (m_OrderReceived != null)
+        //    {
+        //        m_OrderReceived(InputOrders.CAMERA_LEFT, false, 0.0f);
+        //        m_OrderReceived(InputOrders.CAMERA_RIGHT, false, 0.0f);
+        //    }
+        //}
 
 
-        ///Vertical movement
-        if (0.0f <= mousePos.y && mousePos.y <= m_VerticalThreshold.x)
-        {
-            float value = (1.0f - (mousePos.y / m_VerticalThreshold.x));
+        /////Vertical movement
+        //if (0.0f <= mousePos.y && mousePos.y <= m_VerticalThreshold.x)
+        //{
+        //    float value = (1.0f - (mousePos.y / m_VerticalThreshold.x));
 
-            //Debug.Log("CAMERA_LEFT: " + value);
+        //    //Debug.Log("CAMERA_LEFT: " + value);
 
-            if (m_OrderReceived != null)
-            {
-                m_OrderReceived(InputOrders.CAMERA_DOWN, true, -value);
-                m_OrderReceived(InputOrders.CAMERA_UP, false, 0.0f);
-            }
+        //    if (m_OrderReceived != null)
+        //    {
+        //        m_OrderReceived(InputOrders.CAMERA_DOWN, true, -value);
+        //        m_OrderReceived(InputOrders.CAMERA_UP, false, 0.0f);
+        //    }
 
-        }
-        else if (m_VerticalThreshold.y <= mousePos.y && mousePos.y <= 1.0f)
-        {
-            float value = (mousePos.y - m_VerticalThreshold.y) / (1.0f - m_VerticalThreshold.y);
+        //}
+        //else if (m_VerticalThreshold.y <= mousePos.y && mousePos.y <= 1.0f)
+        //{
+        //    float value = (mousePos.y - m_VerticalThreshold.y) / (1.0f - m_VerticalThreshold.y);
 
-            //Debug.Log("CAMERA_RIGHT: " + value);
+        //    //Debug.Log("CAMERA_RIGHT: " + value);
 
-            if (m_OrderReceived != null)
-            {
-                m_OrderReceived(InputOrders.CAMERA_DOWN, false, 0.0f);
-                m_OrderReceived(InputOrders.CAMERA_UP, true, value);
-            }
-        }
-        else
-        {
+        //    if (m_OrderReceived != null)
+        //    {
+        //        m_OrderReceived(InputOrders.CAMERA_DOWN, false, 0.0f);
+        //        m_OrderReceived(InputOrders.CAMERA_UP, true, value);
+        //    }
+        //}
+        //else
+        //{
 
-            //Debug.Log("CAMERA_STOP");
-            if (m_OrderReceived != null)
-            {
-                m_OrderReceived(InputOrders.CAMERA_DOWN, false, 0.0f);
-                m_OrderReceived(InputOrders.CAMERA_UP, false, 0.0f);
-            }
-        }
+        //    //Debug.Log("CAMERA_STOP");
+        //    if (m_OrderReceived != null)
+        //    {
+        //        m_OrderReceived(InputOrders.CAMERA_DOWN, false, 0.0f);
+        //        m_OrderReceived(InputOrders.CAMERA_UP, false, 0.0f);
+        //    }
+        //}
 
         #endregion
 

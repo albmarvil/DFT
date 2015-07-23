@@ -113,6 +113,26 @@ public class GameManager : MonoBehaviour {
     public int m_TotalSpecialTiles = 100;
 
     /// <summary>
+    /// Extra money for each spawner in the game
+    /// </summary>
+    public float m_SpawnerExtraMoney = 20.0f;
+
+    public float SpawnerExtraMoney
+    {
+        get { return m_SpawnerExtraMoney; }
+    }
+
+    /// <summary>
+    /// Extra money for each crystal to defend
+    /// </summary>
+    public float m_CrystalExtraMoney = 10.0f;
+
+    public float CrystalExtraMoney
+    {
+        get { return m_CrystalExtraMoney; }
+    }
+
+    /// <summary>
     /// Property used to access to the MainCamera GameObject
     /// </summary>
     public GameObject MainCamera

@@ -138,6 +138,8 @@ public class MapManager : MonoBehaviour {
     ///  -Creation of default tiles
     ///  -Creation of Crystals and Enemy Spawners
     ///  
+    /// As special rule, for each crystal and spawner the player will have extra money
+    ///  
     /// </summary>
     /// <param name="width">Map width in tile number</param>
     /// <param name="height">Map height in tile number</param>
@@ -158,7 +160,6 @@ public class MapManager : MonoBehaviour {
         }
 
         #endregion
-
 
         #region Creation of Special Tiles
 
@@ -210,6 +211,9 @@ public class MapManager : MonoBehaviour {
         // The number of spawners will be choosen randomly whithin this interval [1, width * 0.5]
         int numSpawners = Random.Range(1, (int)(width * 0.5f));
 
+        //add extra money for each spawner
+        MoneyManager.Singleton.AddMoney(numSpawners * GameManager.Singleton.SpawnerExtraMoney);
+
         for (int i = 0; i <= numSpawners - 1; ++i)
         {
             int row = height - 1;
@@ -241,6 +245,9 @@ public class MapManager : MonoBehaviour {
         // The number of crystals will be choosen randomly whithin this interval [1, width * 0.5]
         int numCrystals = Random.Range(1, (int)(width * 0.5f));
 
+        //add extra money for each crystal
+        MoneyManager.Singleton.AddMoney(numCrystals * GameManager.Singleton.CrystalExtraMoney);
+
         CrystalManager.Singleton.setTotalCrystals(numCrystals);
 
         for (int i = 0; i <= numCrystals - 1; ++i)
@@ -269,7 +276,6 @@ public class MapManager : MonoBehaviour {
         }
 
         #endregion
-
 
     }
 

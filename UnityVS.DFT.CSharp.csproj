@@ -80,9 +80,11 @@
     <Compile Include="Assets\DFT Assets\Scripts\GUI\BuildHUDController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\GUI\CrystalsHUDController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\GUI\EnemiesHUDController.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\GUI\MoneyHUDController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\GUI\WavesHUDController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\LifeBarController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\LifeComponent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Managers\BuildHelpers\BuildingCfg.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\BuildHelpers\BuildingType.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\BuilderManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\CrystalManager.cs" />
@@ -92,11 +94,13 @@
     <Compile Include="Assets\DFT Assets\Scripts\Managers\MapHelpers\TilePosition.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\MapHelpers\TileType.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\MapManager.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Managers\MoneyManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\NavigationPathfinder.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\PoolHelpers\PoolObject.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\PoolHelpers\PoolObjectCfg.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\PoolManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\SpawnerManager.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\MoneyLooter.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterCrystalComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterEnemyComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterMainCamera.cs" />

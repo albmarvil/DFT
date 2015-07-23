@@ -256,7 +256,7 @@ public class SpawnerManager : MonoBehaviour {
 
         int newNumEnemies = (int)(m_CurrentWave.m_NumEnemies + m_WaveCount * m_WaveContribuition);
 
-        float newSpawnTime = Mathf.Max(0.8f ,m_CurrentWave.m_SpawnTime - m_WaveCount * m_WaveContribuition * 0.05f);
+        float newSpawnTime = Mathf.Max(0.8f ,m_CurrentWave.m_SpawnTime - m_WaveCount * m_WaveContribuition * 0.08f);
 
         m_EnemiesHUDController.UpdateHUD(newNumEnemies.ToString(), newNumEnemies.ToString());
 

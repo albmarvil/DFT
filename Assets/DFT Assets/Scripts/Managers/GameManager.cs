@@ -147,11 +147,10 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     public void InitGame()
     {
-        ///Cargo aditivamente el nivel de juego
-        //GameObject scene = GameObject.FindGameObjectWithTag("Scene");
-        //GameObject.Destroy(scene);
+        GameObject scene = GameObject.FindGameObjectWithTag("Scene");
+        GameObject.Destroy(scene);
 
-        //Application.LoadLevelAdditive("Game");
+        Application.LoadLevelAdditive("Game");
     }
 
     #endregion
@@ -159,10 +158,10 @@ public class GameManager : MonoBehaviour {
 
     #region Monobehavior calls
 
-    private void Start()
-    {
-        InitGame();
-    }
+    //private void Start()
+    //{
+    //    InitGame();
+    //}
 
     #endregion
 

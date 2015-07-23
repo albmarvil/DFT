@@ -33,7 +33,10 @@ public class CameraController : MonoBehaviour {
     /// <summary>
     /// Camera movement speed
     /// </summary>
-    public float m_Speed = 1.0f;
+    //public float m_Speed = 1.0f;
+
+
+    public Vector3 m_Speed = Vector3.one;
 
 
     /// <summary>
@@ -51,6 +54,12 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     private Vector3 m_CurrentMovementDir = Vector3.zero;
 
+    /// <summary>
+    /// Current deviation of the keys. m_CurrentMovementDir, express where to move, while
+    /// this vector3 is indicating how much to move
+    /// </summary>
+    private Vector3 m_CurrentValueModifcator = Vector3.zero;
+
     #endregion
 
     #region Public methods
@@ -64,64 +73,77 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     /// <param name="order">Order received</param>
     /// <param name="ok">state of the order (Positive or Negative)</param>
-    private void onOrderReceived(InputManager.InputOrders order, bool ok)
+    /// <param name="value">Extra value</param>
+    private void onOrderReceived(InputManager.InputOrders order, bool ok, float value)
     {
         if (order == InputManager.InputOrders.CAMERA_UP && ok)
         {
             m_CurrentMovementDir.z = 1.0f;
+            m_CurrentValueModifcator.z = value;
         }
         else if (order == InputManager.InputOrders.CAMERA_UP && !ok && m_CurrentMovementDir.z == 1.0f)
         {
             m_CurrentMovementDir.z = 0.0f;
+            m_CurrentValueModifcator.z = value;
         }
 
         if (order == InputManager.InputOrders.CAMERA_DOWN && ok)
         {
             m_CurrentMovementDir.z = -1.0f;
+            m_CurrentValueModifcator.z = -value;
         }
         else if (order == InputManager.InputOrders.CAMERA_DOWN && !ok && m_CurrentMovementDir.z == -1.0f)
         {
             m_CurrentMovementDir.z = 0.0f;
+            m_CurrentValueModifcator.z = -value;
         }
 
 
         if (order == InputManager.InputOrders.CAMERA_LEFT && ok)
         {
             m_CurrentMovementDir.x = -1.0f;
+            m_CurrentValueModifcator.x = -value;
         }
         else if (order == InputManager.InputOrders.CAMERA_LEFT && !ok && m_CurrentMovementDir.x == -1.0f)
         {
             m_CurrentMovementDir.x = 0.0f;
+            m_CurrentValueModifcator.x = -value;
         }
 
 
         if (order == InputManager.InputOrders.CAMERA_RIGHT && ok)
         {
             m_CurrentMovementDir.x = 1.0f;
+            m_CurrentValueModifcator.x = value;
         }
         else if (order == InputManager.InputOrders.CAMERA_RIGHT && !ok && m_CurrentMovementDir.x == 1.0f)
         {
             m_CurrentMovementDir.x = 0.0f;
+            m_CurrentValueModifcator.x = value;
         }
 
 
         if (order == InputManager.InputOrders.CAMERA_ZOOM_IN && ok)
         {
             m_CurrentMovementDir.y = -1.0f;
+            m_CurrentValueModifcator.y = value;
         }
         else if (order == InputManager.InputOrders.CAMERA_ZOOM_IN && !ok && m_CurrentMovementDir.y == -1.0f)
         {
             m_CurrentMovementDir.y = 0.0f;
+            m_CurrentValueModifcator.y = value;
         }
 
 
         if (order == InputManager.InputOrders.CAMERA_ZOOM_OUT && ok)
         {
             m_CurrentMovementDir.y = 1.0f;
+            m_CurrentValueModifcator.y = -value;
         }
         else if (order == InputManager.InputOrders.CAMERA_ZOOM_OUT && !ok && m_CurrentMovementDir.y == 1.0f)
         {
             m_CurrentMovementDir.y = 0.0f;
+            m_CurrentValueModifcator.y = -value;
         }
 
     }
@@ -132,12 +154,14 @@ public class CameraController : MonoBehaviour {
 
     private void Start()
     {
-        InputManager.Singleton.RegisterOrderEvent(onOrderReceived);
+        if(InputManager.Singleton != null)
+            InputManager.Singleton.RegisterOrderEvent(onOrderReceived);
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
-        InputManager.Singleton.UnregisterOrderEvent(onOrderReceived);
+        if(InputManager.Singleton != null)
+            InputManager.Singleton.UnregisterOrderEvent(onOrderReceived);
     }
 
     /// <summary>
@@ -145,13 +169,14 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     private void Update()
     {
-        Vector3 newPosition = m_Transform.position + m_CurrentMovementDir.normalized * m_Speed * Time.deltaTime;
-        m_Transform.position = newPosition;
-        //#region Horizontal movement
-        //#endregion
 
-        //#region Vertical movement
-        //#endregion
+        Vector3 speed = m_CurrentMovementDir.normalized;
+        speed.x *= m_Speed.x * m_CurrentValueModifcator.x;
+        speed.y *= m_Speed.y * m_CurrentValueModifcator.y;
+        speed.z *= m_Speed.z * m_CurrentValueModifcator.z;
+        
+        Vector3 newPosition = m_Transform.position + speed * Time.deltaTime;
+        m_Transform.position = newPosition;
     }
 
     #endregion

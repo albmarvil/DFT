@@ -18,12 +18,14 @@ public class RegisterSpawnerComponent : MonoBehaviour
 
     private void OnEnable()
     {
-        SpawnerManager.Singleton.RegisterSpawner(gameObject);
+        if(SpawnerManager.Singleton != null)
+            SpawnerManager.Singleton.RegisterSpawner(gameObject);
     }
 
     private void OnDisable()
     {
-        SpawnerManager.Singleton.UnregisterSpawner(gameObject);
+        if (SpawnerManager.Singleton != null)
+            SpawnerManager.Singleton.UnregisterSpawner(gameObject);
     }
        
     #endregion

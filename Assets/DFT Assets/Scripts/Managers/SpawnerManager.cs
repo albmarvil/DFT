@@ -213,9 +213,9 @@ public class SpawnerManager : MonoBehaviour {
 
         --m_CurrentWave.m_RemainingEnemies;
 
-        Debug.Log("Enem: " + m_CurrentWave.m_RemainingEnemies + " / " + m_CurrentWave.m_NumEnemies);
+        //Debug.Log("Enem: " + m_CurrentWave.m_RemainingEnemies + " / " + m_CurrentWave.m_NumEnemies);
 
-        Debug.Log("Time: " + m_CurrentWave.m_SpawnTime + " / " + m_InitWaveCfg.m_SpawnTime);
+        //Debug.Log("Time: " + m_CurrentWave.m_SpawnTime + " / " + m_InitWaveCfg.m_SpawnTime);
     }
 
     /// <summary>
@@ -245,7 +245,8 @@ public class SpawnerManager : MonoBehaviour {
     /// </summary>
     /// <param name="order">Order received</param>
     /// <param name="ok">state of the order (Positive or Negative)</param>
-    private void onOrderReceived(InputManager.InputOrders order, bool ok)
+    /// <param name="value">Extra value</param>
+    private void onOrderReceived(InputManager.InputOrders order, bool ok, float value)
     {
         if (order == InputManager.InputOrders.ACCEPT && ok)
         {
@@ -314,10 +315,8 @@ public class SpawnerManager : MonoBehaviour {
     {
         m_spawners.Clear();
 
-        if (InputManager.Singleton != null)
-        {
+        if(InputManager.Singleton != null)
             InputManager.Singleton.UnregisterOrderEvent(onOrderReceived);
-        }
 
     }
 

@@ -72,7 +72,7 @@ public class LifeComponent : MonoBehaviour {
     /// If life reaches 0 (or below) the GameObject will die.
     /// </summary>
     /// <param name="damage">Life to decrease</param>
-    public void Damage(float damage)
+    public virtual void Damage(float damage)
     {
         m_Life -= damage;
 
@@ -86,7 +86,7 @@ public class LifeComponent : MonoBehaviour {
     /// Method used to kill inmediatly the GameObject
     /// It will send "onDie" message
     /// </summary>
-    public void Die()
+    public virtual void Die()
     {
         gameObject.SendMessage("onDie", SendMessageOptions.DontRequireReceiver);
 

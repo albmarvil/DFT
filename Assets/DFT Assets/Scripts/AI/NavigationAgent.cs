@@ -71,6 +71,11 @@ public class NavigationAgent : MonoBehaviour {
     /// </summary>
     private Transform m_Transform = null;
 
+    /// <summary>
+    /// Last remaining distance, used to know if we are going towards the next navPoint. If not, route will be corrected
+    /// </summary>
+    private float m_LastsqrRemainingDistance = float.MaxValue;
+
     #endregion
 
     #region Public methods
@@ -179,10 +184,6 @@ public class NavigationAgent : MonoBehaviour {
 
     #endregion
 
-    #region Private methods
-
-    #endregion
-
     #region Monobehavior calls
 
     /// <summary>
@@ -195,6 +196,8 @@ public class NavigationAgent : MonoBehaviour {
         m_SqrStoppingDistance = m_StoppingDistance * m_StoppingDistance;
 
         m_Transform = gameObject.GetComponent<Transform>();
+
+        m_LastsqrRemainingDistance = float.MaxValue;
     }
 
 
@@ -205,14 +208,23 @@ public class NavigationAgent : MonoBehaviour {
     {
         if (m_canNavigate && m_CurrentRoute.Count > 0)
         {
+            float remainingDist = getSqrRemainingDistance(m_CurrentRoute.Peek().NavigationPosition);
             //stop?
-            if (getSqrRemainingDistance(m_CurrentRoute.Peek().NavigationPosition) <= m_SqrStoppingDistance)
+            if (remainingDist <= m_SqrStoppingDistance)
             {
                 //we have reached a new navPoint
                 m_CurrentRoute.Pop();
 
                 resumeRoute();
             }
+
+            ///Are we going forward the route?
+            if (m_LastsqrRemainingDistance <= remainingDist)
+            {
+                resumeRoute();
+            }
+
+            m_LastsqrRemainingDistance = remainingDist;
 
             //update position
             Vector3 newPos = m_Transform.position + m_CurrentSpeed * Time.deltaTime;

@@ -22,7 +22,7 @@ public class BuildHUDController : MonoBehaviour {
     /// <summary>
     /// Reference to the object that does the highlight
     /// </summary>
-    public GameObject m_Higlight = null;
+    public GameObject m_Highlight = null;
 
     /// <summary>
     /// List of references to all the building buttons
@@ -51,7 +51,7 @@ public class BuildHUDController : MonoBehaviour {
     {
         Vector3 pos = m_BuildingButtons[(int)type].GetComponent<Transform>().position;
 
-        m_Higlight.GetComponent<Transform>().position = pos;
+        m_Highlight.GetComponent<Transform>().position = pos;
 
         BuilderManager.Singleton.SelectBuilding(type);
     }

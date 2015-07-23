@@ -70,13 +70,16 @@
   <ItemGroup>
     <Compile Include="Assets\DFT Assets\Scripts\AI\EnemySimpleBehavior.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\AI\NavigationAgent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\AI\TurretPerception.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\BillboardController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\BuildGhostsRegister.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\CrystalTrigger.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\EnemyKilledComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\GUI\BuildHUDButtonController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\GUI\BuildHUDController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\GUI\CrystalsHUDController.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\GUI\EnemiesHUDController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\GUI\WavesHUDController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\LifeBarController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\LifeComponent.cs" />
@@ -98,7 +101,10 @@
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterEnemyComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterMainCamera.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterSpawnerComponent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\BulletController.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\ShootComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Tile.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\TimeToLive.cs" />
     <Compile Include="Assets\Store Assets\Rocks and Boulders 2\Shaders\RotateGameObject.cs" />
   </ItemGroup>
   <ItemGroup>

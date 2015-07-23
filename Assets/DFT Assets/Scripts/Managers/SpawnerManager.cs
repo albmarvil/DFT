@@ -81,6 +81,7 @@ public class SpawnerManager : MonoBehaviour {
             m_RemainingEnemies = numEnemies;
             m_SpawnTime = spawnTime;
             m_TimeAcum = float.MaxValue;
+            m_NumEnemiesKilled = 0;
         }
 
         /// <summary>
@@ -104,6 +105,12 @@ public class SpawnerManager : MonoBehaviour {
         /// </summary>
         [System.NonSerialized]
         public float m_TimeAcum;
+
+        /// <summary>
+        /// Number of enemies killed in this wave
+        /// </summary>
+        [System.NonSerialized]
+        public int m_NumEnemiesKilled;
     }
 
     public bool funca = false;
@@ -129,9 +136,14 @@ public class SpawnerManager : MonoBehaviour {
     public float m_WaveContribuition = 1.0f;
 
     /// <summary>
-    /// Reference to the HUD controller
+    /// Reference to the Wave HUD controller
     /// </summary>
-    public WavesHUDController m_HUDController = null;
+    public WavesHUDController m_WaveHUDController = null;
+
+    /// <summary>
+    /// Reference to the Enemies HUD Controller
+    /// </summary>
+    public EnemiesHUDController m_EnemiesHUDController = null;
 
     /// <summary>
     /// List of the active spawners in the scene
@@ -175,6 +187,18 @@ public class SpawnerManager : MonoBehaviour {
     #region Public methods
 
     /// <summary>
+    /// Method used to increase the current number of enemies killed
+    /// </summary>
+    public void EnemyKilled()
+    {
+        if (m_CurrentWave != null)
+        {
+            m_CurrentWave.m_NumEnemiesKilled++;
+            m_EnemiesHUDController.UpdateHUD((m_CurrentWave.m_NumEnemies - m_CurrentWave.m_NumEnemiesKilled).ToString(), m_CurrentWave.m_NumEnemies.ToString());
+        } 
+    }
+
+    /// <summary>
     /// Registers a spawner in the manager
     /// </summary>
     /// <param name="spawner">Spawner to register</param>
@@ -209,7 +233,7 @@ public class SpawnerManager : MonoBehaviour {
         GameObject spawner = m_spawners[Random.Range(0, m_spawners.Count)];
         Vector3 position = spawner.GetComponent<Transform>().position;
 
-        PoolManager.Singleton.getInstance(enemy, position);
+        PoolManager.Singleton.getInstance(enemy, position, Quaternion.identity);
 
         --m_CurrentWave.m_RemainingEnemies;
 
@@ -223,15 +247,18 @@ public class SpawnerManager : MonoBehaviour {
     /// </summary>
     private void StartWave()
     {
+        m_TimeBetweenWavesAcum = 0.0f;
         BuilderManager.Singleton.SetBuildingTurn(false);
 
         ++m_WaveCount;
 
-        m_HUDController.UpdateHUD(m_WaveCount);
+        m_WaveHUDController.UpdateHUD(m_WaveCount);
 
         int newNumEnemies = (int)(m_CurrentWave.m_NumEnemies + m_WaveCount * m_WaveContribuition);
 
         float newSpawnTime = Mathf.Max(0.8f ,m_CurrentWave.m_SpawnTime - m_WaveCount * m_WaveContribuition * 0.05f);
+
+        m_EnemiesHUDController.UpdateHUD(newNumEnemies.ToString(), newNumEnemies.ToString());
 
         WaveCfg newWave = new WaveCfg(newNumEnemies, newSpawnTime);
 
@@ -276,7 +303,7 @@ public class SpawnerManager : MonoBehaviour {
                 }
 
                 //if we have spawned all the required enemies and there aren't any alive, we have finished the current wave
-                if (m_CurrentWave.m_RemainingEnemies <= 0 && EnemyManager.Singleton.Enemies.Count <= 0)
+                if (m_CurrentWave.m_RemainingEnemies <= 0 && m_CurrentWave.m_NumEnemies == m_CurrentWave.m_NumEnemiesKilled)
                 {
                     m_inWave = false;
                     BuilderManager.Singleton.SetBuildingTurn(!m_inWave);
@@ -284,6 +311,8 @@ public class SpawnerManager : MonoBehaviour {
             }
             else
             {
+                m_EnemiesHUDController.UpdateHUD("-", "-");
+
                 m_TimeBetweenWavesAcum += Time.deltaTime;
 
                 BuilderManager.Singleton.UpdateHUD(m_TimeBetweenWaves - m_TimeBetweenWavesAcum);
@@ -301,6 +330,7 @@ public class SpawnerManager : MonoBehaviour {
     /// </summary>
     private void Start()
     {
+        m_InitWaveCfg.m_NumEnemiesKilled = m_InitWaveCfg.m_NumEnemies;
         m_CurrentWave = m_InitWaveCfg;
         m_inWave = true;
 

@@ -107,6 +107,8 @@
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterSpawnerComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\BulletController.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\ShootComponent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\SlowdownComponent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\SlowdownTrigger.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Tile.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\TimeToLive.cs" />
     <Compile Include="Assets\Store Assets\Rocks and Boulders 2\Shaders\RotateGameObject.cs" />

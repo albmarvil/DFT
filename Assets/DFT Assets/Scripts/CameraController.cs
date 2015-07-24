@@ -153,7 +153,8 @@ public class CameraController : MonoBehaviour {
             case InputManager.InputOrders.CAMERA_ZOOM:
                 float movement = value * m_ZoomSpeed;
                 m_FocalPointDistance = Mathf.Max(m_FocalPointDistance - movement, 1.0f);
-                m_CameraTransform.position = m_CameraTransform.position + movement * m_CameraTransform.forward;
+                if(m_FocalPointDistance > 1.0f)
+                    m_CameraTransform.position = m_CameraTransform.position + movement * m_CameraTransform.forward;
                 break;
 
             ///Another kind of zoom that only moves in Y axis up or down

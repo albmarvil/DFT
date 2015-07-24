@@ -37,6 +37,22 @@ public class NavigationAgent : MonoBehaviour {
         get { return m_CurrentRoute.Peek().NavigationPosition; }
     }
 
+    /// <summary>
+    /// Max agent speed
+    /// </summary>
+    public float Speed
+    {
+        get { return m_Speed; }
+        set 
+        { 
+            m_Speed = value;
+            if (m_CurrentRoute.Count > 0)
+            {
+                m_CurrentSpeed = m_CurrentSpeed.normalized * m_Speed;
+            }
+        }
+    }
+
     #endregion
 
     #region Private params

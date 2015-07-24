@@ -83,6 +83,8 @@ public class TurretPerception : MonoBehaviour {
 
             RaycastHit hitinfo;
             int mask = (1 << LayerMask.NameToLayer("Turret"));
+            mask |= (1 << LayerMask.NameToLayer("Crystal"));
+            mask |= (1 << LayerMask.NameToLayer("Ignore Raycast"));
             mask = ~mask;
             if (Physics.Raycast(m_PerceptionPoint.position, direction, out hitinfo, m_PerceptionRadius, mask))
             {
@@ -94,13 +96,15 @@ public class TurretPerception : MonoBehaviour {
                 }
                 else
                 {
-                    //Debug.Log("Other: " + other.name + " it's not an enemie");
+                    if (gameObject.tag == "Crystal") 
+                    Debug.Log("Other: " + other.name + " it's not an enemie");
                     continue;
                 }
             }
             else
             {
-                //Debug.Log("Enemy: " + enemy.Key.name + " not seen");
+                if (gameObject.tag == "Crystal")
+                    Debug.Log("Enemy: " + enemy.Key.name + " not seen");
                 continue;
             }
         }

@@ -35,10 +35,14 @@ public class InputManager : MonoBehaviour {
         CAMERA_VERTICAL,
         CAMERA_PITCH,
         CAMERA_YAW,
-        CAMERA_ZOOM,
+        CAMERA_VERTICAL_ZOOM,
         CAMERA_STRAFE,
         CAMERA_FORWARD,
         CAMERA_RUN,
+        CAMERA_HORIZONTAL_ROTATION,
+        CAMERA_VERTICAL_ROTATION,
+        CAMERA_ZOOM,
+        DRAW_FOCAL_POINT,
     }
 
     /// <summary>
@@ -225,6 +229,18 @@ public class InputManager : MonoBehaviour {
             if (m_OrderReceived != null)
                 m_OrderReceived(InputOrders.CAMERA_RUN, false, 0.0f);
         }
+
+
+        if (Input.GetButton("FocalPoint"))
+        {
+            if (m_OrderReceived != null)
+                m_OrderReceived(InputOrders.DRAW_FOCAL_POINT, true, 1.0f);
+        }
+        else
+        {
+            if (m_OrderReceived != null)
+                m_OrderReceived(InputOrders.DRAW_FOCAL_POINT, false, 0.0f);
+        }
         #endregion
 
 
@@ -236,153 +252,192 @@ public class InputManager : MonoBehaviour {
         mousePos.x /= Screen.width;
         mousePos.y /= Screen.height;
 
-        //while pressing right mouse button, have to send camera panning orders
-        if (Input.GetMouseButton((int)MouseButton.RIGHT))
+        #region Camera focal rotation (Max priority)
+        //Detection of the camera rotation, keeping the focal point
+        if (Input.GetMouseButton((int)MouseButton.CENTER))
         {
-            #region Camera pitch/yaw
 
             float xAxis = Input.GetAxis("Mouse X");
             float yAxis = Input.GetAxis("Mouse Y");
 
             if (m_OrderReceived != null)
             {
-                m_OrderReceived(InputOrders.CAMERA_YAW, true, xAxis);
-                m_OrderReceived(InputOrders.CAMERA_PITCH, true, yAxis);
+                m_OrderReceived(InputOrders.CAMERA_HORIZONTAL_ROTATION, true, xAxis);
+                m_OrderReceived(InputOrders.CAMERA_VERTICAL_ROTATION, true, yAxis);
             }
-
-            #endregion
-
-            #region Camera Strafe left/right
-            ///camera strafeleft/right
-            if (Input.GetAxis("Horizontal") != 0.0f)
-            {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_STRAFE, true, Input.GetAxis("Horizontal"));
-                }
-            }
-            else
-            {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_STRAFE, false, 0.0f);
-                }
-            }
-            #endregion
-
-            #region Camera forward/backwards
-            ///move forward or backwards
-            if (Input.GetAxis("Vertical") != 0.0f)
-            {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_FORWARD, true, Input.GetAxis("Vertical"));
-                }
-            }
-            else
-            {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_FORWARD, false, 0.0f);
-                }
-            }
-            #endregion
-
         }
+        #endregion
         else
         {
-            #region Camera horizontal movement (X axis)
-            ///Horizontal Camera movement
-            if (Input.GetAxis("Horizontal") != 0.0f)
+            #region Camera local rotation and free movement mode
+            //while pressing right mouse button, have to send camera panning orders
+            if (Input.GetMouseButton((int)MouseButton.RIGHT))
             {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, true, Input.GetAxis("Horizontal"));
-                }
-            }
-            else if (0.0f <= mousePos.x && mousePos.x <= m_HorizontalThreshold.x)
-            {
-                float value = (1.0f - (mousePos.x / m_HorizontalThreshold.x));
+                #region Camera pitch/yaw
+
+                float xAxis = Input.GetAxis("Mouse X");
+                float yAxis = Input.GetAxis("Mouse Y");
 
                 if (m_OrderReceived != null)
                 {
-                    m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, true, -value);
+                    m_OrderReceived(InputOrders.CAMERA_YAW, true, xAxis);
+                    m_OrderReceived(InputOrders.CAMERA_PITCH, true, yAxis);
                 }
 
-            }
-            else if (m_HorizontalThreshold.y <= mousePos.x && mousePos.x <= 1.0f)
-            {
-                float value = (mousePos.x - m_HorizontalThreshold.y) / (1.0f - m_HorizontalThreshold.y);
+                #endregion
 
-                if (m_OrderReceived != null)
+                #region Camera Strafe left/right
+                ///camera strafeleft/right
+                if (Input.GetAxis("Horizontal") != 0.0f)
                 {
-                    m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, true, value);
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_STRAFE, true, Input.GetAxis("Horizontal"));
+                    }
                 }
-            }
-            else
-            {
-                if (m_OrderReceived != null)
+                else
                 {
-                    m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, false, 0.0f);
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_STRAFE, false, 0.0f);
+                    }
                 }
+                #endregion
+
+                #region Camera forward/backwards
+                ///move forward or backwards
+                if (Input.GetAxis("Vertical") != 0.0f)
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_FORWARD, true, Input.GetAxis("Vertical"));
+                    }
+                }
+                else
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_FORWARD, false, 0.0f);
+                    }
+                }
+                #endregion
+
+                #region Camera zoom (Y axis)
+                if (Input.GetAxis("Mouse ScrollWheel") != 0.0f)
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_VERTICAL_ZOOM, true, Input.GetAxis("Mouse ScrollWheel"));
+                    }
+                }
+                else
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_VERTICAL_ZOOM, false, 0.0f);
+                    }
+                }
+                #endregion
+
             }
             #endregion
-
-            #region Camera Vertical movements(Z Axis)
-            //Vertical Camera movement
-            if (Input.GetAxis("Vertical") != 0.0f)
-            {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_VERTICAL, true, Input.GetAxis("Vertical"));
-                }
-            }
-            else if (0.0f <= mousePos.y && mousePos.y <= m_VerticalThreshold.x)
-            {
-                float value = (1.0f - (mousePos.y / m_VerticalThreshold.x));
-
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_VERTICAL, true, -value);
-                }
-
-            }
-            else if (m_VerticalThreshold.y <= mousePos.y && mousePos.y <= 1.0f)
-            {
-                float value = (mousePos.y - m_VerticalThreshold.y) / (1.0f - m_VerticalThreshold.y);
-
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_VERTICAL, true, value);
-                }
-            }
+            #region Camera normal movements
             else
             {
-                if (m_OrderReceived != null)
+                #region Camera horizontal movement (X axis)
+                ///Horizontal Camera movement
+                if (Input.GetAxis("Horizontal") != 0.0f)
                 {
-                    m_OrderReceived(InputOrders.CAMERA_VERTICAL, false, 0.0f);
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, true, Input.GetAxis("Horizontal"));
+                    }
                 }
+                else if (0.0f <= mousePos.x && mousePos.x <= m_HorizontalThreshold.x)
+                {
+                    float value = (1.0f - (mousePos.x / m_HorizontalThreshold.x));
+
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, true, -value);
+                    }
+
+                }
+                else if (m_HorizontalThreshold.y <= mousePos.x && mousePos.x <= 1.0f)
+                {
+                    float value = (mousePos.x - m_HorizontalThreshold.y) / (1.0f - m_HorizontalThreshold.y);
+
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, true, value);
+                    }
+                }
+                else
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_HORIZONTAL, false, 0.0f);
+                    }
+                }
+                #endregion
+
+                #region Camera Vertical movements(Z Axis)
+                //Vertical Camera movement
+                if (Input.GetAxis("Vertical") != 0.0f)
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_VERTICAL, true, Input.GetAxis("Vertical"));
+                    }
+                }
+                else if (0.0f <= mousePos.y && mousePos.y <= m_VerticalThreshold.x)
+                {
+                    float value = (1.0f - (mousePos.y / m_VerticalThreshold.x));
+
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_VERTICAL, true, -value);
+                    }
+
+                }
+                else if (m_VerticalThreshold.y <= mousePos.y && mousePos.y <= 1.0f)
+                {
+                    float value = (mousePos.y - m_VerticalThreshold.y) / (1.0f - m_VerticalThreshold.y);
+
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_VERTICAL, true, value);
+                    }
+                }
+                else
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_VERTICAL, false, 0.0f);
+                    }
+                }
+                #endregion
+
+                #region Camera zoom
+                if (Input.GetAxis("Mouse ScrollWheel") != 0.0f)
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_ZOOM, true, Input.GetAxis("Mouse ScrollWheel"));
+                    }
+                }
+                else
+                {
+                    if (m_OrderReceived != null)
+                    {
+                        m_OrderReceived(InputOrders.CAMERA_ZOOM, false, 0.0f);
+                    }
+                }
+                #endregion
+
             }
             #endregion
-
-            #region Camera zoom (Y axis)
-            if (Input.GetAxis("Mouse ScrollWheel") != 0.0f)
-            {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_ZOOM, true, Input.GetAxis("Mouse ScrollWheel"));
-                }
-            }
-            else
-            {
-                if (m_OrderReceived != null)
-                {
-                    m_OrderReceived(InputOrders.CAMERA_ZOOM, false, 0.0f);
-                }
-            }
-            #endregion
-
-        } 
+        }
         #endregion
     }
 

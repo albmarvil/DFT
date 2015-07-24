@@ -106,6 +106,8 @@
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterMainCamera.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterSpawnerComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\BulletController.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\BulletShootComponent.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\LaserShootComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Shoot Components\ShootComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\SlowdownComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\SlowdownTrigger.cs" />

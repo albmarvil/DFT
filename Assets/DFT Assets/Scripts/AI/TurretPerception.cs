@@ -44,7 +44,7 @@ public class TurretPerception : MonoBehaviour {
     /// <summary>
     /// Refrence to the current target
     /// </summary>
-    //private GameObject m_CurrentTarget = null;
+    private GameObject m_CurrentTarget = null;
 
     /// <summary>
     /// Reference to the ShootComponent of the turret
@@ -91,22 +91,37 @@ public class TurretPerception : MonoBehaviour {
                 GameObject other = hitinfo.collider.gameObject;
                 if (other.tag == "Enemy")
                 {
-                    m_ShootComponent.Shoot(other, 1.0f);
+                    m_ShootComponent.Shoot(hitinfo.point, other);
+                    m_CurrentTarget = other;
                     break;
                 }
                 else
                 {
-                    if (gameObject.tag == "Crystal") 
-                    Debug.Log("Other: " + other.name + " it's not an enemie");
+                    if (m_CurrentTarget != null)
+                    {
+                        //message to alert that there's no current target
+                        gameObject.SendMessage("OnTargetLost", SendMessageOptions.DontRequireReceiver);
+                    }
+                    m_CurrentTarget = null;
                     continue;
                 }
             }
             else
             {
-                if (gameObject.tag == "Crystal")
-                    Debug.Log("Enemy: " + enemy.Key.name + " not seen");
+                if (m_CurrentTarget != null)
+                {
+                    //message to alert that there's no current target
+                    gameObject.SendMessage("OnTargetLost", SendMessageOptions.DontRequireReceiver);
+                }
+                m_CurrentTarget = null;
                 continue;
             }
+        }
+
+        if ((m_CurrentTarget != null && !m_CurrentTarget.activeSelf) || perceivedEnemies.Count <= 0)
+        {
+            //message to alert that there's no current target
+            gameObject.SendMessage("OnTargetLost", SendMessageOptions.DontRequireReceiver);
         }
     }
 
@@ -117,7 +132,7 @@ public class TurretPerception : MonoBehaviour {
     {
         m_SqrPerceptionRadius = m_PerceptionRadius * m_PerceptionRadius;
         m_ShootComponent = gameObject.GetComponent<ShootComponent>();
-        //m_CurrentTarget = null;
+        m_CurrentTarget = null;
     }
 
     /// <summary>

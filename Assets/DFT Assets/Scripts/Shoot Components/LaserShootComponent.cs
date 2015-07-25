@@ -129,7 +129,8 @@ public class LaserShootComponent : ShootComponent
             m_Laser.gameObject.SetActive(false);
             m_ParticleEnd.SetActive(false);
         }
-    }
+    }
+
 
     /// <summary>
     /// Set-Up of fresh start

@@ -53,7 +53,16 @@ public class SlowdownComponent : MonoBehaviour {
     /// <param name="slow">True to slowdown, false to set it's original speed again</param>
     public void Slowdown(bool slow, float multiplier)
     {
-        if (!m_Slowed && slow)
+
+        if(!slow)
+        {
+            m_Slowed = slow;
+
+            m_NavAgent.Speed = m_OriginalSpeed;
+
+            m_Particles.SetActive(false);
+        }
+        else if (!m_Slowed)
         {
             m_Slowed = slow;
 
@@ -62,14 +71,6 @@ public class SlowdownComponent : MonoBehaviour {
             m_NavAgent.Speed = m_OriginalSpeed * multiplier;
 
             m_Particles.SetActive(true);
-        }
-        else if(m_Slowed && !slow)
-        {
-            m_Slowed = slow;
-
-            m_NavAgent.Speed = m_OriginalSpeed;
-
-            m_Particles.SetActive(false);
         }
     }
 

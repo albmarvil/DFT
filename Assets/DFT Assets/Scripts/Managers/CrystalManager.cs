@@ -116,6 +116,11 @@ public class CrystalManager : MonoBehaviour {
         m_Crystals.Remove(crystal);
 
         m_CrystalsHUD.UpdateCrystalsHUD(m_Crystals.Count, m_total);
+
+        if (m_Crystals.Count <= 0)
+        {
+            GameManager.Singleton.EndGame();
+        }
     }
 
     #endregion

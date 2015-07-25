@@ -150,50 +150,51 @@ public class BuilderManager : MonoBehaviour {
     /// <param name="tile">Tile to build</param>
     private void createBuilding(int index, Tile tile)
     {
-
-        if (index != -1 && tile != null && tile.Available)
+        if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
         {
-            //we can't block the routes throug the map
-            tile.Navigable = false; //has to do this to test if there is a valid path
-
-            Tile spawners = MapManager.Singleton.getTileByWorldPosition(SpawnerManager.Singleton.Spawners[0].GetComponent<Transform>().position);
-            Tile crystals = MapManager.Singleton.getTileByWorldPosition(CrystalManager.Singleton.Crystals[0].GetComponent<Transform>().position);
-
-            List<Tile> path = NavigationPathfinder.Singleton.calculatePath(spawners, crystals);
-
-            if (path != null)
+            if (index != -1 && tile != null && tile.Available)
             {
-                if (MoneyManager.Singleton.SpendMoney(m_Buildings[index].m_Cost))
-                {
-                    PoolManager.Singleton.getInstance(m_Buildings[index].m_Building, tile.NavigationPosition, Quaternion.identity);
+                //we can't block the routes throug the map
+                tile.Navigable = false; //has to do this to test if there is a valid path
 
-                    //Tell the enemies that they must recalculate their routes
-                    foreach (GameObject enemy in EnemyManager.Singleton.Enemies)
+                Tile spawners = MapManager.Singleton.getTileByWorldPosition(SpawnerManager.Singleton.Spawners[0].GetComponent<Transform>().position);
+                Tile crystals = MapManager.Singleton.getTileByWorldPosition(CrystalManager.Singleton.Crystals[0].GetComponent<Transform>().position);
+
+                List<Tile> path = NavigationPathfinder.Singleton.calculatePath(spawners, crystals);
+
+                if (path != null)
+                {
+                    if (MoneyManager.Singleton.SpendMoney(m_Buildings[index].m_Cost))
                     {
-                        enemy.SendMessage("CalculateRouteToTarget", SendMessageOptions.DontRequireReceiver);
+                        PoolManager.Singleton.getInstance(m_Buildings[index].m_Building, tile.NavigationPosition, Quaternion.identity);
+
+                        //Tell the enemies that they must recalculate their routes
+                        foreach (GameObject enemy in EnemyManager.Singleton.Enemies)
+                        {
+                            enemy.SendMessage("CalculateRouteToTarget", SendMessageOptions.DontRequireReceiver);
+                        }
+
+                        tile.Available = false;
+                        tile.Navigable = false;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Not enough money");
+                        tile.Navigable = true;
+                        tile.Available = false;
                     }
 
-                    tile.Available = false;
-                    tile.Navigable = false;
                 }
                 else
                 {
-                    Debug.LogWarning("Not enough money");
+                    Debug.LogWarning("Cannot block map routes with buildings");
                     tile.Navigable = true;
                     tile.Available = false;
                 }
-                
-            }
-            else
-            {
-                Debug.LogWarning("Cannot block map routes with buildings");
-                tile.Navigable = true;
-                tile.Available = false;
-            }
 
-            drawGhost(m_Buildings[index].m_Building, tile, m_Buildings[index].m_Cost);
-        }
-            
+                drawGhost(m_Buildings[index].m_Building, tile, m_Buildings[index].m_Cost);
+            }
+        }   
     }
 
     /// <summary>
@@ -257,27 +258,29 @@ public class BuilderManager : MonoBehaviour {
             RaycastHit hitInfo;
 
             //Debug.DrawRay(ray.origin, ray.direction, Color.green);
-
-            if (Physics.Raycast(ray, out hitInfo, 1000.0f, mask))
+            if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
             {
-                //Debug.Log(hitInfo.collider.gameObject.tag);
-                GameObject col = hitInfo.collider.gameObject;
-                if (col.tag == "Tiles" && m_CurrentTile != col.GetComponent<Tile>())
+                if (Physics.Raycast(ray, out hitInfo, 1000.0f, mask))
                 {
-                    m_CurrentTile = col.GetComponent<Tile>();
+                    //Debug.Log(hitInfo.collider.gameObject.tag);
+                    GameObject col = hitInfo.collider.gameObject;
+                    if (col.tag == "Tiles" && m_CurrentTile != col.GetComponent<Tile>())
+                    {
+                        m_CurrentTile = col.GetComponent<Tile>();
 
-                    if (m_CurrentBuildingIndex != -1)
-                        drawGhost(m_Buildings[m_CurrentBuildingIndex].m_Building, m_CurrentTile, m_Buildings[m_CurrentBuildingIndex].m_Cost);
+                        if (m_CurrentBuildingIndex != -1)
+                            drawGhost(m_Buildings[m_CurrentBuildingIndex].m_Building, m_CurrentTile, m_Buildings[m_CurrentBuildingIndex].m_Cost);
+                    }
                 }
-            }
-            else
-            {
-                //Debug.Log("NONE");
-                m_CurrentTile = null;
-                if (m_CurrentBuildingGhost != null)
+                else
                 {
-                    PoolManager.Singleton.destroyInstance(m_CurrentBuildingGhost);
-                    m_CurrentBuildingGhost = null;
+                    //Debug.Log("NONE");
+                    m_CurrentTile = null;
+                    if (m_CurrentBuildingGhost != null)
+                    {
+                        PoolManager.Singleton.destroyInstance(m_CurrentBuildingGhost);
+                        m_CurrentBuildingGhost = null;
+                    }
                 }
             }
         }

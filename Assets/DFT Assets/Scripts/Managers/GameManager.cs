@@ -12,6 +12,8 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+//using System.Linq;
 
 public class GameManager : MonoBehaviour {
 
@@ -66,7 +68,6 @@ public class GameManager : MonoBehaviour {
     {
         get { return m_MapWidth; }
     }
-
     /// <summary>
     /// Public property to access to the mapHeight
     /// </summary>
@@ -167,23 +168,75 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     public void InitGame()
     {
+        m_TotalSpecialTiles = Mathf.Min((int)(m_MapWidth * m_MapHeight * 0.125f), m_TotalSpecialTiles);
+
         GameObject scene = GameObject.FindGameObjectWithTag("Scene");
         GameObject.Destroy(scene);
 
         Application.LoadLevelAdditive("Game");
     }
 
+    /// <summary>
+    /// This function creates the EndGame Scene
+    /// </summary>
+    public void EndGame()
+    {
+        GameObject scene = GameObject.FindGameObjectWithTag("Scene");
+        GameObject.Destroy(scene);
+
+        Application.LoadLevelAdditive("EndGame");
+    }
+
+
+    /// <summary>
+    /// This function exits the application
+    /// </summary>
+    public void Exit()
+    {
+        Debug.Log("ByeBye");
+        Application.Quit();
+    }
+
+    /// <summary>
+    /// Method used to setup a new map width
+    /// </summary>
+    /// <param name="mapWidth">map width</param>
+    public void ConfigMapWidth(string mapWidth)
+    {
+        bool parsed = System.Int32.TryParse(mapWidth, out m_MapWidth);
+        if (!parsed)
+            Debug.LogWarning("Wrong map width");
+        else
+            m_MapWidth = Mathf.Max(4, m_MapWidth);
+    }
+
+
+    /// <summary>
+    /// Method used to setup a new map height
+    /// </summary>
+    /// <param name="mapHeight">map height</param>
+    public void ConfigMapHeight(string mapHeight)
+    {
+        bool parsed = System.Int32.TryParse(mapHeight, out m_MapHeight);
+        if (!parsed)
+            Debug.LogWarning("Wrong map height");
+        else
+            m_MapHeight = Mathf.Max(8, m_MapHeight);
+    }
+
+
+    /// <summary>
+    /// Method used to setup the number of special tiles
+    /// </summary>
+    /// <param name="specialTiles">special tiles</param>
+    public void ConfigSpecialTiles(string specialTiles)
+    {
+        bool parsed = System.Int32.TryParse(specialTiles, out m_TotalSpecialTiles);
+        if (!parsed)
+            Debug.LogWarning("Wrong special tiles number");
+        else
+            m_TotalSpecialTiles = Mathf.Min((int)(m_MapWidth * m_MapHeight * 0.125f), m_TotalSpecialTiles);
+    }
+
     #endregion
-
-
-    #region Monobehavior calls
-
-    //private void Start()
-    //{
-    //    InitGame();
-    //}
-
-    #endregion
-
-
 }

@@ -61,9 +61,10 @@ public class NavigationPathfinder : MonoBehaviour {
 
 	#region Public params
 
-    //public GameObject marker = null;
-
-    //public GameObject marker2 = null;
+    /// <summary>
+    /// This flag allows to navigate using diagonals of the square grid
+    /// </summary>
+    public bool m_DiagonalNavigation = false;
 
     #endregion
 
@@ -100,7 +101,6 @@ public class NavigationPathfinder : MonoBehaviour {
     /// <returns>List of tiles (path) ordered from Destination to Origin</returns>
     public List<Tile> calculateOptimalPath(Tile from, Tile to)
     {
-        //Debug.Log("LETS GO");
         BFSState currentState = new BFSState();
 
         currentState.m_VisitedNodes.Add(from, new KeyValuePair<Tile, float>(null, 0.0f));
@@ -109,7 +109,7 @@ public class NavigationPathfinder : MonoBehaviour {
 
         while (currentState.m_OpenedNodes.Count > 0)
         {
-            List<Tile> children = currentState.CurrentNode.getChildren();
+            List<Tile> children = currentState.CurrentNode.getChildren(m_DiagonalNavigation);
 
             //filter the children to obtain the Valid ones
             List<Tile> validChildren = new List<Tile>();
@@ -121,17 +121,13 @@ public class NavigationPathfinder : MonoBehaviour {
                 }
             }
 
-            //Debug.Log("Current: " + currentState.CurrentNode.name);
-            //Debug.Log(currentState.m_OpenedNodes.Count);
             foreach (Tile child in validChildren)
             {
                 
                 float totalPathWeight = child.NavigationWeight + currentState.m_VisitedNodes[currentState.CurrentNode].Value;
-                //Debug.Log("Parent: " + currentState.CurrentNode.name + " Child: " + child.name + "Path: " + totalPathWeight);
 
                 if (totalPathWeight < currentState.m_bound)
                 {
-                    //Debug.Log("Dentro de la poda: " + currentState.m_bound);
                     if (currentState.m_VisitedNodes.ContainsKey(child))
                     {
                         //if our current path is better than the existing one, we update values
@@ -175,18 +171,6 @@ public class NavigationPathfinder : MonoBehaviour {
 
             path.Add(from);
 
-
-            ////DEBUG
-
-            //Debug.Log("START PATH============================");
-            //foreach (Tile node in path)
-            //{
-            //    //Debug.Log(node.name);
-            //    GameObject.Instantiate(marker2, node.NavigationPosition + new Vector3(0, 1, 0), Quaternion.identity);
-            //}
-            //Debug.Log("END PATH==============================");
-
-
             return path;
         }
         else
@@ -205,7 +189,6 @@ public class NavigationPathfinder : MonoBehaviour {
     /// <returns>List of tiles (path) ordered from Destination to Origin</returns>
     public List<Tile> calculatePath(Tile from, Tile to)
     {
-        //Debug.Log("LETS GO");
         BFSState currentState = new BFSState();
 
         currentState.m_VisitedNodes.Add(from, new KeyValuePair<Tile, float>(null, 0.0f));
@@ -216,7 +199,7 @@ public class NavigationPathfinder : MonoBehaviour {
 
         while (currentState.m_OpenedNodes.Count > 0 && loop)
         {
-            List<Tile> children = currentState.CurrentNode.getChildren();
+            List<Tile> children = currentState.CurrentNode.getChildren(m_DiagonalNavigation);
 
             //filter the children to obtain the Valid ones
             List<Tile> validChildren = new List<Tile>();
@@ -275,18 +258,6 @@ public class NavigationPathfinder : MonoBehaviour {
 
             path.Add(from);
 
-
-            ////DEBUG
-
-            //Debug.Log("START PATH============================");
-            //foreach (Tile node in path)
-            //{
-            //    //Debug.Log(node.name);
-            //    GameObject.Instantiate(marker2, node.NavigationPosition + new Vector3(0, 1, 0), Quaternion.identity);
-            //}
-            //Debug.Log("END PATH==============================");
-
-
             return path;
         }
         else
@@ -295,14 +266,6 @@ public class NavigationPathfinder : MonoBehaviour {
         }
     }
 
-
-    #endregion
-
-    #region Private methods
-
-    #endregion
-
-    #region Monobehavior calls
 
     #endregion
 

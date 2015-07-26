@@ -26,8 +26,7 @@ public class CrystalTrigger : MonoBehaviour
         if (other.tag == "Enemy")
         {
             PoolManager.Singleton.destroyInstance(gameObject);
-
-            Debug.Log("You should do some feedback");
+            CrystalManager.Singleton.CrystalDestroyed();
         }
             
     }

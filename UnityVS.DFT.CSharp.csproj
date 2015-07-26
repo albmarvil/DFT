@@ -101,6 +101,7 @@
     <Compile Include="Assets\DFT Assets\Scripts\Managers\PoolManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Managers\SpawnerManager.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\MoneyLooter.cs" />
+    <Compile Include="Assets\DFT Assets\Scripts\OnDieExplosion.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterCrystalComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterEnemyComponent.cs" />
     <Compile Include="Assets\DFT Assets\Scripts\Register Components\RegisterMainCamera.cs" />

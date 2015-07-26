@@ -150,8 +150,9 @@ public class Tile : MonoBehaviour {
     /// Method used for pathfinding. It will return all the children of this Tile.
     /// Also will filter the tiles, giving only those where navigation is allowed
     /// </summary>
+    /// <param name="useDiagonals">True to use diagonal tiles as valid children</param>
     /// <returns>Valid children of this tile</returns>
-    public List<Tile> getChildren()
+    public List<Tile> getChildren(bool useDiagonals)
     {
         List<Tile> children = new List<Tile>();
 
@@ -188,6 +189,43 @@ public class Tile : MonoBehaviour {
         {
             child = MapManager.Singleton.Matrix[row][column];
             children.Add(child);
+        }
+
+        if (useDiagonals)
+        {
+            row = NavigationTilePosition.Row + 1;
+            column = NavigationTilePosition.Column - 1;
+            if (0 <= row && row < GameManager.Singleton.MapHeight && 0 <= column && column < GameManager.Singleton.MapWidth)
+            {
+                child = MapManager.Singleton.Matrix[row][column];
+                children.Add(child);
+            }
+
+            row = NavigationTilePosition.Row + 1;
+            column = NavigationTilePosition.Column + 1;
+            if (0 <= row && row < GameManager.Singleton.MapHeight && 0 <= column && column < GameManager.Singleton.MapWidth)
+            {
+                child = MapManager.Singleton.Matrix[row][column];
+                children.Add(child);
+            }
+
+
+            row = NavigationTilePosition.Row - 1;
+            column = NavigationTilePosition.Column - 1;
+            if (0 <= row && row < GameManager.Singleton.MapHeight && 0 <= column && column < GameManager.Singleton.MapWidth)
+            {
+                child = MapManager.Singleton.Matrix[row][column];
+                children.Add(child);
+            }
+
+
+            row = NavigationTilePosition.Row - 1;
+            column = NavigationTilePosition.Column + 1;
+            if (0 <= row && row < GameManager.Singleton.MapHeight && 0 <= column && column < GameManager.Singleton.MapWidth)
+            {
+                child = MapManager.Singleton.Matrix[row][column];
+                children.Add(child);
+            }
         }
 
         return children;

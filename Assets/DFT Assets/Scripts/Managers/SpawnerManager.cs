@@ -113,8 +113,6 @@ public class SpawnerManager : MonoBehaviour {
         public int m_NumEnemiesKilled;
     }
 
-    public bool funca = false;
-
     /// <summary>
     /// List of the different prefabs to spawn radomly all the enemies
     /// </summary>
@@ -290,39 +288,38 @@ public class SpawnerManager : MonoBehaviour {
 
     private void Update()
     {
-        if (funca)
+
+        if (m_inWave && m_CurrentWave != null)
         {
-            if (m_inWave && m_CurrentWave != null)
+            m_CurrentWave.m_TimeAcum += Time.deltaTime;
+
+            if (m_CurrentWave.m_TimeAcum >= m_CurrentWave.m_SpawnTime && m_CurrentWave.m_RemainingEnemies > 0)
             {
-                m_CurrentWave.m_TimeAcum += Time.deltaTime;
-
-                if (m_CurrentWave.m_TimeAcum >= m_CurrentWave.m_SpawnTime && m_CurrentWave.m_RemainingEnemies > 0)
-                {
-                    SpawnEnemy();
-                    m_CurrentWave.m_TimeAcum = 0.0f;
-                }
-
-                //if we have spawned all the required enemies and there aren't any alive, we have finished the current wave
-                if (m_CurrentWave.m_RemainingEnemies <= 0 && m_CurrentWave.m_NumEnemies == m_CurrentWave.m_NumEnemiesKilled)
-                {
-                    m_inWave = false;
-                    BuilderManager.Singleton.SetBuildingTurn(!m_inWave);
-                }
+                SpawnEnemy();
+                m_CurrentWave.m_TimeAcum = 0.0f;
             }
-            else
+
+            //if we have spawned all the required enemies and there aren't any alive, we have finished the current wave
+            if (m_CurrentWave.m_RemainingEnemies <= 0 && m_CurrentWave.m_NumEnemies == m_CurrentWave.m_NumEnemiesKilled)
             {
-                m_EnemiesHUDController.UpdateHUD("-", "-");
-
-                m_TimeBetweenWavesAcum += Time.deltaTime;
-
-                BuilderManager.Singleton.UpdateHUD(m_TimeBetweenWaves - m_TimeBetweenWavesAcum);
-
-                if (m_TimeBetweenWavesAcum >= m_TimeBetweenWaves)
-                {
-                    StartWave();
-                }
+                m_inWave = false;
+                BuilderManager.Singleton.SetBuildingTurn(!m_inWave);
             }
         }
+        else
+        {
+            m_EnemiesHUDController.UpdateHUD("-", "-");
+
+            m_TimeBetweenWavesAcum += Time.deltaTime;
+
+            BuilderManager.Singleton.UpdateHUD(m_TimeBetweenWaves - m_TimeBetweenWavesAcum);
+
+            if (m_TimeBetweenWavesAcum >= m_TimeBetweenWaves)
+            {
+                StartWave();
+            }
+        }
+        
     }
 
     /// <summary>

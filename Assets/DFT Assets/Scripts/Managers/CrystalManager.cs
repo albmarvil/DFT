@@ -88,6 +88,10 @@ public class CrystalManager : MonoBehaviour {
 
     #region Public methods
 
+    /// <summary>
+    /// Total number of crystals in the current game
+    /// </summary>
+    /// <param name="total">total number of crystals</param>
     public void setTotalCrystals(int total)
     {
         m_total = total;
@@ -116,8 +120,16 @@ public class CrystalManager : MonoBehaviour {
         m_Crystals.Remove(crystal);
 
         m_CrystalsHUD.UpdateCrystalsHUD(m_Crystals.Count, m_total);
+    }
 
-        if (m_Crystals.Count <= 0)
+    /// <summary>
+    /// Method used when a crystal is destroyed
+    /// </summary>
+    public void CrystalDestroyed()
+    {
+        --m_total;
+
+        if (m_total <= 0)
         {
             GameManager.Singleton.EndGame();
         }

@@ -4,7 +4,8 @@
 
 Temp/
 Library/
-
+*.csproj
+*.sln
 
 #################
 ## Eclipse

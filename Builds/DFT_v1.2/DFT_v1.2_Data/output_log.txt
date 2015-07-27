@@ -1,0 +1,70 @@
+Initialize engine version: 5.0.4f1 (1d75c08f1c9c)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 10.1]
+    Renderer: Intel(R) HD Graphics 3000 (ID=0x116)
+    Vendor:   Intel
+    VRAM:     128 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+- Completed reload, in  0.054 seconds
+desktop: 1920x1080 60Hz; virtual: 3286x1080 at -1366,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+Platform assembly: D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: D:\DFT\DFT\Builds\DFT_v1.2\DFT_v1.2_Data\Managed\System.dll (this message is harmless)
+Setting up 1 worker threads for Enlighten.
+  Thread -> id: c44 -> priority: 1 
+Shader 'Toon/Basic Outline': fallback shader 'Toon/Basic' not found
+WARNING: Shader Unsupported: 'Toon/Basic Outline' - Setting to default shader.
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+Look rotation viewing vector is zero
+ 
+(Filename:  Line: 71)
+
+NullReferenceException
+  at (wrapper managed-to-native) UnityEngine.Behaviour:get_enabled ()
+  at UnityEngine.EventSystems.UIBehaviour.IsActive () [0x00000] in <filename unknown>:0 
+  at UnityEngine.UI.Graphic.SetVerticesDirty () [0x00000] in <filename unknown>:0 
+  at UnityEngine.UI.Text.set_text (System.String value) [0x00000] in <filename unknown>:0 
+  at CrystalsHUDController.UpdateCrystalsHUD (Int32 current, Int32 total) [0x00000] in <filename unknown>:0 
+  at CrystalManager.UnregisterCrystal (UnityEngine.GameObject crystal) [0x00000] in <filename unknown>:0 
+  at RegisterCrystalComponent.OnDisable () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
